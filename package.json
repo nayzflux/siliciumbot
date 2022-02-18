@@ -1,0 +1,21 @@
+{
+  "name": "siliciumbot",
+  "version": "1.0.0",
+  "description": "An useful discord bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "NayZ.Sodium",
+  "license": "MIT",
+  "dependencies": {
+    "@discordjs/voice": "^0.7.5",
+    "discord.js": "^13.6.0",
+    "libsodium-wrappers": "^0.7.9",
+    "yt-search": "^2.10.3",
+    "ytdl-core": "^4.10.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0"
+  }
+}

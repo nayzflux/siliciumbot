@@ -1,0 +1,23 @@
+[
+    {
+        "name": "Discord Ambiance",
+        "author": "Silicium'Bot DJ 💪",
+        "songs": [
+            {
+                "name": "MC Hammer - U Can't Touch This (Official Music Video)",
+                "publisher": "MC HAMMER",
+                "url": "https://www.youtube.com/watch?v=otCpCn0l4Wo"
+            },
+            {
+                "name": "The Weeknd - Blinding Lights (Official Audio)",
+                "publisher": "The Weeknd",
+                "url": "https://www.youtube.com/watch?v=fHI8X4OXluQ"
+            },
+            {
+                "name": "SAINt JHN - Roses (Imanbek Remix) (Official Music Video)",
+                "publisher": "SAINt JHN",
+                "url": "https://www.youtube.com/watch?v=2zToEPpFEN8"
+            }
+        ]
+    }
+]

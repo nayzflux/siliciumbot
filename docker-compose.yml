@@ -1,0 +1,8 @@
+version: "3"
+
+services: 
+    bot:
+        image: nayzbysodium/siliciumbot:latest
+        restart: on-failure
+        environment:
+            TOKEN: token
