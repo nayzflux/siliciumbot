@@ -10,6 +10,8 @@ const queue = new Map();
 const getSong = async (args) => {
     let song = null;
 
+    console.log(args);
+
     if (ytdl.validateURL(args[0])) {
         let songInfo = await ytdl.getInfo(args[0]);
         song = { title: songInfo.videoDetails.title, url: songInfo.videoDetails.video_url, publisher: songInfo.videoDetails.ownerChannelName }
@@ -111,6 +113,8 @@ const play = (guildId, voiceChannel, callback) => {
 
         // when a song finished play next 
         serverQueue.audioPlayer.on(AudioPlayerStatus.Idle, () => {
+            console.log(`idle`);
+
             // remove old song
             serverQueue.songs.shift();
             console.log(`[MUSIC] ➖ Previous song removed`);
