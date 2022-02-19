@@ -38,7 +38,8 @@ module.exports = {
 
                 const embed = new Discord.MessageEmbed()
                     .setTitle(`🗒️ **| __Liste des playlists:__**`)
-                    .setDescription(`\`Voici la liste de toutes les playlists publiées par les utilisateurs et disponible sur l'ensemble des serveurs où le Silicium'Bot est disponible. La playlist 🎸 Mémorial contient les musiques iconiques de la vie de Silicium'Bot.\``);
+                    .setDescription(`\`Voici la liste de toutes les playlists publiées par les utilisateurs et disponible sur l'ensemble des serveurs où le Silicium'Bot est disponible. La playlist 😍 Mémorial contient les musiques iconiques de la vie de Silicium'Bot.\``)
+                    .setColor(`FF00FF`);
 
 
                 allPlaylists.forEach(playlist => {
@@ -72,8 +73,14 @@ module.exports = {
                             .setColor(`#FF0000`);
 
                         return message.reply({ embeds: [missingPermissionEmbed] });
+                    } else {
+                        const successEmbed = new Discord.MessageEmbed()
+                            .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
+                            .setDescription(`\`Playlist 🗑️ supprimée.\``)
+                            .setColor(`#FF00FF`);
+
+                        return message.reply({ embeds: [successEmbed] });
                     }
-                    else return message.reply(`✅ **| \`${playlist.name} de ${playlist.creator.username} supprimé.\`**`);
                 }));
             }
 
@@ -154,12 +161,12 @@ module.exports = {
                         return message.reply({ embeds: [unknowPlaylist] });
                     }
 
-                    const embed = new Discord.MessageEmbed()
-                        .setTitle(`<:playlist:944294054194208769> **| __${playlist.name} de ${playlist.creator.username}:__**`)
-                        .setDescription(`Cette playlist a été publié par un utilisateur.`);
+                    const successEmbed = new Discord.MessageEmbed()
+                        .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
+                        .setColor(`#FF00FF`);
 
                     if (playlist.creator.id === `427095581773791232` || playlist.creator.id === `691588356341104670` || playlist.creator.id === `802223487233294347`) {
-                        embed.setDescription(`<:verify:944374392606048348> Cette playlist a été publié par un utilisateur certifié.`);
+                        successEmbed.setDescription(`\`Cette playlist a été publié par un utilisateur ✅ certifié.\``);
                     }
 
                     let i = 0;
@@ -167,10 +174,10 @@ module.exports = {
                     playlist.songs.forEach(song => {
                         i++;
 
-                        embed.addField(`**__${i}__**:`, `${song.title} de ${song.publisher}`, true);
+                        successEmbed.addField(`**${i}**:`, `\`${song.title} de ${song.publisher}\``, false);
                     });
 
-                    return message.reply({ embeds: [embed] });
+                    return message.reply({ embeds: [successEmbed] });
                 }));
             }
         }
@@ -180,8 +187,21 @@ module.exports = {
                 // create pl
                 const name = args.slice(1).join(`-`);
                 playlistController.createPlaylist(name, message.author.id, ((err, playlist) => {
-                    if (err) return message.reply(`❌ **| \`Une playlist porte déjà ce nom.\`**`);
-                    return message.reply(`✅ **| \`${playlist.name} créer avec succès.\`**`);
+                    if (err) {
+                        const unknowPlaylist = new Discord.MessageEmbed()
+                            .setTitle(`❌ **| __Erreur:__**`)
+                            .setDescription(`\`Une playlist porte déjà le nom de ${args[1]} !\``)
+                            .setColor(`#FF0000`);
+
+                        return message.reply({ embeds: [unknowPlaylist] });
+                    } else {
+                        const successEmbed = new Discord.MessageEmbed()
+                            .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
+                            .setDescription(`\`Playlist 🆕 créée.\``)
+                            .setColor(`#FF00FF`);
+
+                        return message.reply({ embeds: [successEmbed] });
+                    }
                 }));
             }
         }
@@ -197,8 +217,14 @@ module.exports = {
                             .setColor(`#FF0000`);
 
                         return message.reply({ embeds: [missingPermissionEmbed] });
+                    } else {
+                        const successEmbed = new Discord.MessageEmbed()
+                            .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
+                            .setDescription(`\`${song.title} de ${song.publisher} ➕ ajouté.\``)
+                            .setColor(`#FF00FF`);
+
+                        return message.reply({ embeds: [successEmbed] });
                     }
-                    return message.reply(`➕ **| \`${song.title} de ${song.publisher} ajouté à ${playlist.name}.\`**`);
                 }));
             }
 
@@ -213,8 +239,14 @@ module.exports = {
                             .setColor(`#FF0000`);
 
                         return message.reply({ embeds: [missingPermissionEmbed] });
+                    } else {
+                        const successEmbed = new Discord.MessageEmbed()
+                            .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
+                            .setDescription(`\`${song.title} de ${song.publisher} ➖ retiré.\``)
+                            .setColor(`#FF00FF`);
+
+                        return message.reply({ embeds: [successEmbed] });
                     }
-                    return message.reply(`➖ **| \`${song.title} de ${song.publisher} retiré de ${playlist.name}.\`**`);
                 }));
             }
         }
