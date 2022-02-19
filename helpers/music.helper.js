@@ -3,10 +3,28 @@ const ytdl = require(`ytdl-core`);
 const fs = require(`fs`);
 const ytSearch = require("yt-search");
 const { logSongAdded, logSongSkipped } = require("../controller/analytics.controller");
+const { clear } = require("console");
 
 const DOWLOAD_PATH = `./temp/downloads/`;
 
 const queue = new Map();
+
+const clearText = (text) => {
+    return text
+        .replace(`"`, ``)
+        .replace(`"`, ``)
+        .replace(`'`, ``)
+        .replace(`'`, ``)
+        .replace("`", ``)
+        .replace("`", ``)
+        .replace(`/`, ``)
+        .replace(`\\`, ``)
+        .replace(`|`, ``)
+        .replace(`[`, ``)
+        .replace(`]`, ``)
+        .replace(`{`, ``)
+        .replace(`}`, ``)
+}
 
 const getSong = async (args) => {
     let song = null;
@@ -15,7 +33,7 @@ const getSong = async (args) => {
 
     if (ytdl.validateURL(args[0])) {
         let songInfo = await ytdl.getInfo(args[0]);
-        song = { title: songInfo.videoDetails.title.replace(`"`, ``).replace(`"`, ``).replace(`'`, ``).replace(`'`, ``).replace("`", ``).replace("`", ``), url: songInfo.videoDetails.video_url, publisher: songInfo.videoDetails.ownerChannelName.replace(`"`, ``).replace(`"`, ``).replace(`'`, ``).replace(`'`, ``).replace("`", ``).replace("`", ``) }
+        song = { title: clearText(songInfo.videoDetails.title), url: songInfo.videoDetails.video_url, publisher: clear(songInfo.videoDetails.ownerChannelName) }
     } else {
         let videoFinder = async (query) => {
             let videoResult = await ytSearch(query);
@@ -25,7 +43,7 @@ const getSong = async (args) => {
         let video = await videoFinder(args.join(" "));
 
         if (video) {
-            song = { title: video.title.replace(`"`, ``).replace(`"`, ``).replace(`'`, ``).replace(`'`, ``).replace("`", ``).replace("`", ``), url: video.url, publisher: video.author.name.replace(`"`, ``).replace(`"`, ``).replace(`'`, ``).replace(`'`, ``).replace("`", ``).replace("`", ``) }
+            song = { title: clearText(video.title), url: video.url, publisher: clearText(video.author.name) }
         }
     }
 
@@ -276,6 +294,16 @@ const stop = (guildId, callback) => {
     return callback(false);
 }
 
+const getServerQueue = (guildId, callback) => {
+    const serverQueue = queue.get(guildId);
+
+    if (!serverQueue) return callback(true, null);
+    if (!serverQueue.connection) return callback(true, null);
+    if (!serverQueue.audioPlayer) return callback(true, null);
+
+    return callback(false, serverQueue);
+}
+
 module.exports = {
     getSong,
     addSong,
@@ -284,5 +312,6 @@ module.exports = {
     stop,
     skip,
     tooglePause,
-    getDebug
+    getDebug,
+    getServerQueue
 }
