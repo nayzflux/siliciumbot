@@ -2,6 +2,7 @@ const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerSta
 const ytdl = require(`ytdl-core`);
 const fs = require(`fs`);
 const ytSearch = require("yt-search");
+const { logSongAdded, logSongSkipped } = require("../controller/analytics.controller");
 
 const DOWLOAD_PATH = `./temp/downloads/`;
 
@@ -111,6 +112,8 @@ const play = (guildId, voiceChannel, callback) => {
 
         console.log(`[MUSIC] 🎵 Playing ${song.title}`);
 
+        logSongAdded(song)
+
         // when a song finished play next 
         serverQueue.audioPlayer.on(AudioPlayerStatus.Idle, () => {
             console.log(`idle`);
@@ -139,6 +142,8 @@ const play = (guildId, voiceChannel, callback) => {
                 serverQueue.audioPlayer.play(newAudioRessource);
 
                 console.log(`[MUSIC] 🎵 Playing ${newSong.title}`);
+
+                logSongAdded(newSong)
             }
         });
 
@@ -214,6 +219,8 @@ const skip = (guildId, callback) => {
 
     console.log(`[MUSIC] ⏭️ Skipping...`);
 
+    logSongSkipped(serverQueue.songs[0]);
+
     // remove old song
     serverQueue.songs.shift();
     console.log(`[MUSIC] ➖ Previous song removed`);
@@ -240,6 +247,8 @@ const skip = (guildId, callback) => {
         serverQueue.audioPlayer.play(newAudioRessource);
 
         console.log(`[MUSIC] 🎵 Playing ${newSong.title}`);
+
+        logSongAdded(newSong);
 
         return callback(false, false, newSong);
     }
