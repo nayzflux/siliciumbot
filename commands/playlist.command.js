@@ -165,8 +165,16 @@ module.exports = {
                         .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
                         .setColor(`#FF00FF`);
 
-                    if (playlist.creator.id === `427095581773791232` || playlist.creator.id === `691588356341104670` || playlist.creator.id === `802223487233294347`) {
+                    if (playlist.creator.id === `670295136600588309` || playlist.creator.id === `691588356341104670` || playlist.creator.id === `802223487233294347`) {
                         successEmbed.setDescription(`\`Cette playlist a été publié par un utilisateur ✅ certifié.\``);
+                    }
+
+                    if (playlist.creator.id === `427095581773791232`) {
+                        successEmbed.setDescription(`\`Cette playlist a été publié par un membre du 🦺 staff.\``);
+                    }
+
+                    if (playlist.creator.id === `427095581773791232`) {
+                        successEmbed.setDescription(`\`Cette playlist a été publié par 💪 Silicium'Bot#6728 DJ 🎧.\``);
                     }
 
                     let i = 0;
