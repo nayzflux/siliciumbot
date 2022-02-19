@@ -27,11 +27,18 @@ module.exports = {
          */
         if (args.length === 1 && args[0] === `list`) {
             playlistController.getPlaylists((err, allPlaylists) => {
-                if (err) return message.reply(`❌ **| \`Impossible de lister les playlists.\`**`);
+                if (err) {
+                    const missingPermissionEmbed = new Discord.MessageEmbed()
+                        .setTitle(`❌ **| __Erreur:__**`)
+                        .setDescription(`\`Impossible de charger les playlists, merci réessayer plus tard !\``)
+                        .setColor(`#FF0000`);
+
+                    return message.reply({ embeds: [missingPermissionEmbed] });
+                }
 
                 const embed = new Discord.MessageEmbed()
-                    .setTitle(`**__<:playlist:944294054194208769> Liste des playlists:__**`)
-                    .setDescription(`Voici la liste de toutes les playlists publiées par les utilisateurs et disponible sur l'ensemble des serveurs où le Silicium'Bot est disponible.`);
+                    .setTitle(`🗒️ **| __Liste des playlists:__**`)
+                    .setDescription(`\`Voici la liste de toutes les playlists publiées par les utilisateurs et disponible sur l'ensemble des serveurs où le Silicium'Bot est disponible. La playlist 🎸 Mémorial contient les musiques iconiques de la vie de Silicium'Bot.\``);
 
 
                 allPlaylists.forEach(playlist => {
@@ -42,13 +49,13 @@ module.exports = {
                         i++;
 
                         if (i === 1) {
-                            songsList = `**${i} - \`${song.title}\` de \`${song.publisher}\`**`;
+                            songsList = `**${i} -** \`${song.title} de ${song.publisher}\``;
                         } else {
-                            songsList = `${songsList}\n        **${i} - \`${song.title}\` de \`${song.publisher}\`**`;
+                            songsList = `${songsList}\n        **${i} -** \`${song.title} de ${song.publisher}\``;
                         }
                     });
 
-                    embed.addField(`**__${playlist.name}__ de __${playlist.creator.username}__**:`, songsList, true);
+                    embed.addField(`${playlist.name} de ${playlist.creator.username}:`, songsList, true);
                 });
 
                 return message.reply({ embeds: [embed] });
@@ -58,14 +65,28 @@ module.exports = {
         if (args.length === 2) {
             if (args[0] === `delete`) {
                 playlistController.deletePlaylist(args[1], message.author.id, ((err, playlist) => {
-                    if (err) return message.reply(`❌ **| \`Vous ne possédez ${args[1]}.\`**`);
+                    if (err) {
+                        const missingPermissionEmbed = new Discord.MessageEmbed()
+                            .setTitle(`❌ **| __Erreur:__**`)
+                            .setDescription(`\`Vous ne possédez pas cette playlist !\``)
+                            .setColor(`#FF0000`);
+
+                        return message.reply({ embeds: [missingPermissionEmbed] });
+                    }
                     else return message.reply(`✅ **| \`${playlist.name} de ${playlist.creator.username} supprimé.\`**`);
                 }));
             }
 
             if (args[1] === `play`) {
                 playlistController.getPlaylist(args[0], ((err, playlist) => {
-                    if (err) return message.reply(`❌ **| \`Cette playlist n'existe pas.\`**`);
+                    if (err) {
+                        const unknowPlaylist = new Discord.MessageEmbed()
+                            .setTitle(`❌ **| __Erreur:__**`)
+                            .setDescription(`\`Cette playlist est introuvable !\``)
+                            .setColor(`#FF0000`);
+
+                        return message.reply({ embeds: [unknowPlaylist] });
+                    }
 
                     const voiceChannel = message.member.voice.channel;
 
@@ -124,7 +145,14 @@ module.exports = {
             if (args[1] === `list`) {
                 // list songs
                 playlistController.getPlaylist(args[0], ((err, playlist) => {
-                    if (err) return message.reply(`❌ **| \`Cette playlist n'existe pas.\`**`);
+                    if (err) {
+                        const unknowPlaylist = new Discord.MessageEmbed()
+                            .setTitle(`❌ **| __Erreur:__**`)
+                            .setDescription(`\`Cette playlist est introuvable !\``)
+                            .setColor(`#FF0000`);
+
+                        return message.reply({ embeds: [unknowPlaylist] });
+                    }
 
                     const embed = new Discord.MessageEmbed()
                         .setTitle(`<:playlist:944294054194208769> **| __${playlist.name} de ${playlist.creator.username}:__**`)
@@ -153,7 +181,7 @@ module.exports = {
                 const name = args.slice(1).join(`-`);
                 playlistController.createPlaylist(name, message.author.id, ((err, playlist) => {
                     if (err) return message.reply(`❌ **| \`Une playlist porte déjà ce nom.\`**`);
-                    return message.reply(`<:yes:826110916571299901> **| \`${playlist.name} créer avec succès.\`**`);
+                    return message.reply(`✅ **| \`${playlist.name} créer avec succès.\`**`);
                 }));
             }
         }
@@ -162,7 +190,14 @@ module.exports = {
             if (args[1] === `add`) {
                 const song = await musicHelper.getSong(args.slice(2));
                 playlistController.addSong(args[0], message.author.id, song, ((err, playlist) => {
-                    if (err) return message.reply(`❌ **| \`Vous ne possédez pas ${args[0]}.\`**`);
+                    if (err) {
+                        const missingPermissionEmbed = new Discord.MessageEmbed()
+                            .setTitle(`❌ **| __Erreur:__**`)
+                            .setDescription(`\`Vous ne possédez pas cette playlist !\``)
+                            .setColor(`#FF0000`);
+
+                        return message.reply({ embeds: [missingPermissionEmbed] });
+                    }
                     return message.reply(`➕ **| \`${song.title} de ${song.publisher} ajouté à ${playlist.name}.\`**`);
                 }));
             }
@@ -171,7 +206,14 @@ module.exports = {
                 // rm song from pl
                 const song = await musicHelper.getSong(args.slice(2));
                 playlistController.removeSong(args[0], message.author.id, song, ((err, playlist) => {
-                    if (err) return message.reply(`❌ **| \`Vous ne possédez pas ${args[0]}.\`**`);
+                    if (err) {
+                        const missingPermissionEmbed = new Discord.MessageEmbed()
+                            .setTitle(`❌ **| __Erreur:__**`)
+                            .setDescription(`\`Vous ne possédez pas cette playlist !\``)
+                            .setColor(`#FF0000`);
+
+                        return message.reply({ embeds: [missingPermissionEmbed] });
+                    }
                     return message.reply(`➖ **| \`${song.title} de ${song.publisher} retiré de ${playlist.name}.\`**`);
                 }));
             }
