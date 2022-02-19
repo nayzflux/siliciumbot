@@ -173,7 +173,7 @@ module.exports = {
                         successEmbed.setDescription(`\`Cette playlist a été publié par un membre du 🦺 staff.\``);
                     }
 
-                    if (playlist.creator.id === `427095581773791232`) {
+                    if (playlist.creator.id === `772868067305848842`) {
                         successEmbed.setDescription(`\`Cette playlist a été publié par 💪 Silicium'Bot#6728 DJ 🎧.\``);
                     }
 
