@@ -14,7 +14,7 @@ const getSong = async (args) => {
 
     if (ytdl.validateURL(args[0])) {
         let songInfo = await ytdl.getInfo(args[0]);
-        song = { title: songInfo.videoDetails.title, url: songInfo.videoDetails.video_url, publisher: songInfo.videoDetails.ownerChannelName }
+        song = { title: songInfo.videoDetails.title.replace(`"`, ``).replace(`"`, ``).replace(`'`, ``).replace(`'`, ``).replace("`", ``).replace("`", ``), url: songInfo.videoDetails.video_url, publisher: songInfo.videoDetails.ownerChannelName.replace(`"`, ``).replace(`"`, ``).replace(`'`, ``).replace(`'`, ``).replace("`", ``).replace("`", ``) }
     } else {
         let videoFinder = async (query) => {
             let videoResult = await ytSearch(query);
@@ -24,7 +24,7 @@ const getSong = async (args) => {
         let video = await videoFinder(args.join(" "));
 
         if (video) {
-            song = { title: video.title, url: video.url, publisher: video.author.name }
+            song = { title: video.title.replace(`"`, ``).replace(`"`, ``).replace(`'`, ``).replace(`'`, ``).replace("`", ``).replace("`", ``), url: video.url, publisher: video.author.name.replace(`"`, ``).replace(`"`, ``).replace(`'`, ``).replace(`'`, ``).replace("`", ``).replace("`", ``) }
         }
     }
 
