@@ -40,7 +40,7 @@ const getPlaylists = async (callback) => {
     for (const playlist of playlists) {
         const creator = await userHelper.getUserById(playlist.creator_id);
         playlistsResolved.push({ name: playlist.name, creator: creator, songs: playlist.songs });
-      }
+    }
 
     return callback(false, playlistsResolved);
 }

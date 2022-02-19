@@ -44,7 +44,7 @@ module.exports = {
 
                 allPlaylists.forEach(playlist => {
                     let i = 0;
-                    let songsList = ``;
+                    let songsList = `\`❌ Ne contient aucune musique\``;
 
                     playlist.songs.forEach(song => {
                         i++;
