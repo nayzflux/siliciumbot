@@ -16,3 +16,7 @@ require(`./handler/commands.handler`).loadCommands(Discord, client);
 
 // login to Discord API
 client.login(process.env.TOKEN);
+
+module.exports = {
+    client
+}
