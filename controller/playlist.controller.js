@@ -1,5 +1,5 @@
 const PlaylistModel = require("../models/playlist.model");
-const userHelper = require(`../helpers/user.helper`);
+const userHelper = require(`../helpers/helper`);
 
 const createPlaylist = async (name, creatorId, callback) => {
     if (await PlaylistModel.exists({ name: name })) return callback(true);

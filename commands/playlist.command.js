@@ -1,10 +1,11 @@
 const { PREFIX } = require("../handler/commands.handler");
 const musicHelper = require(`../helpers/music.helper`);
 const playlistController = require(`../controller/playlist.controller`);
+const spotifyHelper = require(`../helpers/spotify.helper`);
 
 module.exports = {
     name: `playlist`,
-    description: `Jouer une playlist\n${PREFIX}pl list\n${PREFIX}pl create/delete <nom>\n${PREFIX}pl <nom> list\n${PREFIX}pl <nom> add/rm <musique>\n${PREFIX}pl <nom> play`,
+    description: `Jouer une playlist\n${PREFIX}pl list\n${PREFIX}pl create/delete <nom>\n${PREFIX}pl <nom> list\n${PREFIX}pl <nom> add/rm <musique>\n${PREFIX}pl <nom> play\n${PREFIX}pl <nom> import <lien spotify>`,
     aliases: [`playlist`, `pl`, `plist`],
     run: async (Discord, client, message, sender, args) => {
         if (!sender.permissions.has(`SEND_MESSAGES`)) {
@@ -52,6 +53,8 @@ module.exports = {
                         if (i === 1) {
                             songsList = `**${i} -** \`${song.title} de ${song.publisher}\``;
                         } else {
+                            if (`${songsList}\n        **${i} -** \`${song.title} de ${song.publisher}\``.length >= 1024) return;
+
                             songsList = `${songsList}\n        **${i} -** \`${song.title} de ${song.publisher}\``;
                         }
                     });
@@ -211,6 +214,44 @@ module.exports = {
                         return message.reply({ embeds: [successEmbed] });
                     }
                 }));
+            }
+        }
+
+        if (args.length === 3) {
+            if (args[1] === `import`) {
+                message.reply(`⏱️ **| \`Importation de votre playlist depuis 🎵 Spotify, merci de patienter, cette opération peut prendre jusqu'à plusieurs ⏳ minutes...\`**`)
+
+                spotifyHelper.getSongsFromPlaylist(args[2], (err, songs) => {
+                    if (err) {
+                        const errorEmbed = new Discord.MessageEmbed()
+                            .setTitle(`❌ **| __Erreur:__**`)
+                            .setDescription(`\`Importation depuis Spotify impossible !\``)
+                            .setColor(`#FF0000`);
+
+                        return message.reply({ embeds: [errorEmbed] });
+                    } else {
+                        // add songs from spotify to playlist
+                        songs.forEach(song => {
+                            playlistController.addSong(args[0], message.author.id, song, ((err, playlist) => {
+                                if (err) {
+                                    const missingPermissionEmbed = new Discord.MessageEmbed()
+                                        .setTitle(`❌ **| __Erreur:__**`)
+                                        .setDescription(`\`Vous ne possédez pas cette playlist !\``)
+                                        .setColor(`#FF0000`);
+
+                                    return message.reply({ embeds: [missingPermissionEmbed] });
+                                } else {
+                                    const successEmbed = new Discord.MessageEmbed()
+                                        .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
+                                        .setDescription(`\`${song.title} de ${song.publisher} ➕ ajouté.\``)
+                                        .setColor(`#FF00FF`);
+
+                                    return message.reply({ embeds: [successEmbed] });
+                                }
+                            }));
+                        });
+                    }
+                });
             }
         }
 

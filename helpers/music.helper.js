@@ -40,8 +40,6 @@ const clearText = (text) => {
 const getSong = async (args) => {
     let song = null;
 
-    console.log(args);
-
     if (ytdl.validateURL(args[0])) {
         let songInfo = await ytdl.getInfo(args[0]);
         song = { title: clearText(songInfo.videoDetails.title), url: songInfo.videoDetails.video_url, publisher: clear(songInfo.videoDetails.ownerChannelName) }
