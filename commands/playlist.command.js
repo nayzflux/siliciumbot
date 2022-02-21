@@ -5,7 +5,7 @@ const spotifyHelper = require(`../helpers/spotify.helper`);
 
 module.exports = {
     name: `playlist`,
-    description: `Jouer une playlist\n${PREFIX}pl list\n${PREFIX}pl create/delete <nom>\n${PREFIX}pl <nom> list\n${PREFIX}pl <nom> add/rm <musique>\n${PREFIX}pl <nom> play\n${PREFIX}pl <nom> import <lien spotify>`,
+    description: `Jouer une playlist\n${PREFIX}pl list\n${PREFIX}pl create/delete <nom>\n${PREFIX}pl list <nom>\n${PREFIX}pl <nom> add/rm <musique>\n${PREFIX}pl play <nom>\n${PREFIX}pl <nom> import <lien spotify>`,
     aliases: [`playlist`, `pl`, `plist`],
     run: async (Discord, client, message, sender, args) => {
         if (!sender.permissions.has(`SEND_MESSAGES`)) {
@@ -152,9 +152,9 @@ module.exports = {
                 }));
             }
 
-            if (args[1] === `list`) {
+            if (args[0] === `list`) {
                 // list songs
-                playlistController.getPlaylist(args[0], ((err, playlist) => {
+                playlistController.getPlaylist(args[1], ((err, playlist) => {
                     if (err) {
                         const unknowPlaylist = new Discord.MessageEmbed()
                             .setTitle(`❌ **| __Erreur:__**`)
@@ -316,6 +316,13 @@ module.exports = {
                     }
                 }));
             }
+
+            const syntaxError = new Discord.MessageEmbed()
+                .setTitle(`❌ **| __Erreur:__**`)
+                .setDescription(`\`${PREFIX}pl list\n${PREFIX}pl list <playlist>\n${PREFIX}pl create/delete <playlist>\n${PREFIX}pl play <playlist>\n${PREFIX}pl <playlist> add/rm <musique>\n${PREFIX}pl <playlist> import <lien spotify>\``)
+                .setColor(`#FF0000`);
+
+            return message.reply({ embeds: [syntaxError] });
         }
     }
 }
