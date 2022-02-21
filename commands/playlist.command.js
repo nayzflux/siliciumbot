@@ -231,25 +231,43 @@ module.exports = {
                         return message.reply({ embeds: [errorEmbed] });
                     } else {
                         // add songs from spotify to playlist
-                        songs.forEach(song => {
-                            playlistController.addSong(args[0], message.author.id, song, ((err, playlist) => {
-                                if (err) {
-                                    const missingPermissionEmbed = new Discord.MessageEmbed()
-                                        .setTitle(`❌ **| __Erreur:__**`)
-                                        .setDescription(`\`Vous ne possédez pas cette playlist !\``)
-                                        .setColor(`#FF0000`);
+                        playlistController.addSong(args[0], message.author.id, songs, ((err, playlist) => {
+                            if (err) {
+                                const missingPermissionEmbed = new Discord.MessageEmbed()
+                                    .setTitle(`❌ **| __Erreur:__**`)
+                                    .setDescription(`\`Vous ne possédez pas cette playlist !\``)
+                                    .setColor(`#FF0000`);
 
-                                    return message.reply({ embeds: [missingPermissionEmbed] });
-                                } else {
-                                    const successEmbed = new Discord.MessageEmbed()
-                                        .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
-                                        .setDescription(`\`${song.title} de ${song.publisher} ➕ ajouté.\``)
-                                        .setColor(`#FF00FF`);
+                                return message.reply({ embeds: [missingPermissionEmbed] });
+                            } else {
+                                const successEmbed = new Discord.MessageEmbed()
+                                    .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
+                                    .setDescription(`\`Votre playlist a été ⏬ importée depuis 🎵 Spotify.\``)
+                                    .setColor(`#FF00FF`);
 
-                                    return message.reply({ embeds: [successEmbed] });
-                                }
-                            }));
-                        });
+                                return message.reply({ embeds: [successEmbed] });
+                            }
+                        }));
+
+                        // songs.forEach(song => {
+                        //     playlistController.addSong(args[0], message.author.id, song, ((err, playlist) => {
+                        //         if (err) {
+                        //             const missingPermissionEmbed = new Discord.MessageEmbed()
+                        //                 .setTitle(`❌ **| __Erreur:__**`)
+                        //                 .setDescription(`\`Vous ne possédez pas cette playlist !\``)
+                        //                 .setColor(`#FF0000`);
+
+                        //             return message.reply({ embeds: [missingPermissionEmbed] });
+                        //         } else {
+                        //             const successEmbed = new Discord.MessageEmbed()
+                        //                 .setTitle(`🗒️ **| __${playlist.name} de ${playlist.creator.username}:__**`)
+                        //                 .setDescription(`\`${song.title} de ${song.publisher} ➕ ajouté.\``)
+                        //                 .setColor(`#FF00FF`);
+
+                        //             return message.reply({ embeds: [successEmbed] });
+                        //         }
+                        //     }));
+                        // });
                     }
                 });
             }
