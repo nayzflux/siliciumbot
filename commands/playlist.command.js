@@ -64,6 +64,7 @@ module.exports = {
 
                 return message.reply({ embeds: [embed] });
             });
+            return;
         }
 
         if (args.length === 2) {
@@ -85,6 +86,7 @@ module.exports = {
                         return message.reply({ embeds: [successEmbed] });
                     }
                 }));
+                return;
             }
 
             if (args[0] === `play`) {
@@ -150,6 +152,7 @@ module.exports = {
                         });
                     }
                 }));
+                return;
             }
 
             if (args[0] === `list`) {
@@ -190,6 +193,8 @@ module.exports = {
 
                     return message.reply({ embeds: [successEmbed] });
                 }));
+
+                return;
             }
         }
 
@@ -214,6 +219,8 @@ module.exports = {
                         return message.reply({ embeds: [successEmbed] });
                     }
                 }));
+
+                return;
             }
         }
 
@@ -270,6 +277,8 @@ module.exports = {
                         // });
                     }
                 });
+
+                return;
             }
         }
 
@@ -293,6 +302,7 @@ module.exports = {
                         return message.reply({ embeds: [successEmbed] });
                     }
                 }));
+                return;
             }
 
             if (args[1] === `rm` || args[1] === `remove`) {
@@ -315,6 +325,7 @@ module.exports = {
                         return message.reply({ embeds: [successEmbed] });
                     }
                 }));
+                return;
             }
 
             const syntaxError = new Discord.MessageEmbed()
