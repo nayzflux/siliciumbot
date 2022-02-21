@@ -87,8 +87,8 @@ module.exports = {
                 }));
             }
 
-            if (args[1] === `play`) {
-                playlistController.getPlaylist(args[0], ((err, playlist) => {
+            if (args[0] === `play`) {
+                playlistController.getPlaylist(args[1], ((err, playlist) => {
                     if (err) {
                         const unknowPlaylist = new Discord.MessageEmbed()
                             .setTitle(`❌ **| __Erreur:__**`)
