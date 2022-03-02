@@ -1,5 +1,6 @@
 const musicHelper = require(`../helpers/music.helper`);
 const { PREFIX } = require(`../handler/commands.handler`);
+const spotifyHelper = require("../helpers/spotify.helper");
 
 module.exports = {
     name: `play`,
@@ -30,8 +31,13 @@ module.exports = {
 
             message.reply(`⏱️ **| \`Merci de patienter...\`**`);
 
-            // get song info
-            const song = await musicHelper.getSong(args);
+            let song;
+
+            if (await spotifyHelper.isValidTrackUrl(args[0])) {
+                await spotifyHelper.getSongFromTrack(args[0], (err, songs) => song = songs[0]);
+            } else {
+                song = await musicHelper.getSong(args);
+            }
 
             if (!song) {
                 const unknowSoundEmbed = new Discord.MessageEmbed()
