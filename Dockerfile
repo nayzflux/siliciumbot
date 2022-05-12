@@ -1,4 +1,4 @@
-FROM node:slim
+FROM node:16.15-slim
 
 WORKDIR /app
 
@@ -11,8 +11,9 @@ RUN npm install --production-only
 RUN apt-get update -y
 RUN apt-get install ffmpeg -y
 
-# create /temp/downloads directory
+# create temporary directory
 RUN mkdir ./temp
-RUN mkdir ./temp/downloads
+RUN mkdir ./temp/musics
+RUN mkdir ./temp/captcha
 
 CMD ["npm", "start"]

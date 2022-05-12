@@ -1,5 +1,7 @@
 /node_modules/
-/temp
+/temp/
+/.github/
+.env
 .dockerignore
 Dockerfile
 docker-compose.yml
