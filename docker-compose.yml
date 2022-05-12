@@ -1,8 +1,14 @@
 version: "3"
 
-services: 
+services:
     bot:
         image: nayzbysodium/siliciumbot:latest
         restart: on-failure
+        volumes:
+            - ./temp/downloads/:/app/temp/downloads
         environment:
-            TOKEN: token
+            TOKEN: secret
+            MONGO_URL: secret
+            PREFIX: secret
+            SPOTIFY_CLIENT_ID: secret
+            SPOTIFY_CLIENT_SECRET: secret
