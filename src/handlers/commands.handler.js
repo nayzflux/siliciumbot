@@ -4,7 +4,7 @@ const commands = new Map();
 
 // load all commands
 const loadCommands = async (Discord, client) => {
-    const devGuild = await client.guilds.cache.get(`825305270267150336`);
+    // const devGuild = await client.guilds.cache.get(`825305270267150336`);
 
     fs.readdir(`./src/commands/`, (err, filesName) => {
         if (err) return console.log(`[COMMAND] ❌ Error`, err);
@@ -17,22 +17,22 @@ const loadCommands = async (Discord, client) => {
             commands.set(command.name, command);
 
             // register slash commands for dev
-            devGuild.commands.create(
-                {
-                    name: command.name,
-                    description: command.description,
-                    options: command.options
-                }
-            );
-
-            // register slash commands for prod
-            // client.application.commands.create(
+            // devGuild.commands.create(
             //     {
             //         name: command.name,
             //         description: command.description,
             //         options: command.options
             //     }
             // );
+
+            // register slash commands for prod
+            client.application.commands.create(
+                {
+                    name: command.name,
+                    description: command.description,
+                    options: command.options
+                }
+            );
 
             return console.log(`[COMMAND] 💪 Command /${command.name} (./commands/${fileName}) loaded`);
         });
