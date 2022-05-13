@@ -58,7 +58,31 @@ module.exports = {
             }
 
             if (musicHelper.isYoutubeUrl(music)) {
-                return interaction.editReply({ embeds: [embedEnum.MUSIC_URL_NOT_SUPPORTED(guild)] });
+                // obtenir la musique depuis youtube
+                musicHelper.getFromYouTubeLink(music, (err, song) => {
+                    if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_NOT_FOUND(guild)] });
+
+                    // téléchargement de la musique
+                    musicHelper.download(song, (err) => {
+                        if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_DOWNLOAD_ERROR(guild)] });
+
+                        // ajout de la musique dans la file d'attente
+                        musicHelper.addSong(guild.id, song);
+
+                        // jouer la musique
+                        musicHelper.play(guild.id, voiceChannel, (err, isCurentlyPlayed) => {
+                            if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAY_ERROR(guild)] });
+
+                            if (isCurentlyPlayed) {
+                                return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAYED(guild, song)] });
+                            } else {
+                                return interaction.editReply({ embeds: [embedEnum.MUSIC_ADDED_TO_QUEUE(guild, song)] });
+                            }
+                        });
+                    });
+                });
+
+                return;
             }
 
             return interaction.editReply({ embeds: [embedEnum.MUSIC_URL_NOT_SUPPORTED(guild)] });

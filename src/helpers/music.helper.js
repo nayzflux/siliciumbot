@@ -54,7 +54,7 @@ const isSpotifyUrl = (text) => {
 }
 
 const isYoutubeUrl = (text) => {
-    if (text.startsWith(`https://youtube.com`) || text.startsWith(`http://youtube.com`) || text.startsWith(`https://youtu.be`) || text.startsWith(`http://youtu.be`)) {
+    if (text.startsWith(`https://www.youtube.com`) || text.startsWith(`http://www.youtube.com`) || text.startsWith(`https://youtu.be`) || text.startsWith(`http://youtu.be`)) {
         return true;
     }
 
@@ -366,6 +366,15 @@ const isValidTrackUrl = async (link) => {
     else return true;
 }
 
+const getFromYouTubeLink = async (link, callback) => {
+    if (ytdl.validateURL(link)) {
+        let info = await ytdl.getInfo(link);
+        return callback(false, { title: clearText(info.videoDetails.title), url: info.videoDetails.video_url, publisher: clearText(info.videoDetails.ownerChannelName) });
+    }
+
+    return callback(true, null);
+}
+
 
 module.exports = {
     isUrl,
@@ -380,5 +389,6 @@ module.exports = {
     stop,
     getServerQueue,
     isValidTrackUrl,
-    getSongFromTrack
+    getSongFromTrack,
+    getFromYouTubeLink
 }
