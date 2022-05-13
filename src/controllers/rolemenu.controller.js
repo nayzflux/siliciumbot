@@ -1,6 +1,28 @@
 const GuildModel = require(`../models/guild.model`);
 
 const { getRoleById } = require(`../helpers/role.helper`);
+const { getChannelById } = require(`../helpers/channel.helper`);
+
+module.exports.getRolemenus = async (guildId) => {
+    const guild = await GuildModel.findOne({ guildId: guildId });
+
+    // si le serveur n'est pas enregistré dans la base de données
+    if (!guild) return [];
+
+    const completedRolemenus = [];
+
+    for (i in guild.rolemenus) {
+        const rm = guild.rolemenus[i];
+        const messageId = rm.messageId;
+        const emoji = rm.emoji;
+        const role = await getRoleById(guildId, rm.roleId);
+        const channel = await getChannelById(guildId, rm.channelId);
+
+        if (role && channel && messageId && emoji) completedRolemenus.push({ _id: rm._id, messageId: messageId, channel: channel, role: role, emoji: emoji });
+    }
+
+    return completedRolemenus;
+}
 
 module.exports.getRole = async (guildId, channelId, messageId, emoji) => {
     const guild = await GuildModel.findOne({ guildId: guildId });

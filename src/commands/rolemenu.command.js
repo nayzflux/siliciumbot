@@ -1,4 +1,5 @@
-const { addRolemenu } = require(`../controllers/rolemenu.controller`);
+const { addRolemenu, getRolemenus } = require(`../controllers/rolemenu.controller`);
+const embedEnum = require(`../enum/embed.enum`);
 const { channelLocked, missingPermission, channelLockedConfirm } = require(`../helpers/embeds.helper`);
 
 module.exports = {
@@ -6,7 +7,7 @@ module.exports = {
     description: `Permet de faire d'ajouter un rôle via des réactions`,
     options: [
         {
-            name: `créer`,
+            name: `create`,
             type: `SUB_COMMAND`,
             description: `Créer un rolemenu`,
             options: [
@@ -37,15 +38,34 @@ module.exports = {
                 }
             ]
         },
+        {
+            name: `delete`,
+            type: `SUB_COMMAND`,
+            description: `Supprimer un rolemenu`,
+            options: [
+                {
+                    name: `rolemenuid`,
+                    type: `STRING`,
+                    description: `ID du rôle avec menu`,
+                    required: true
+                }
+            ]
+        },
+        {
+            name: `list`,
+            type: `SUB_COMMAND`,
+            description: `Lister les rôles avec menu`,
+            options: []
+        },
     ],
     run: async (Discord, client, interaction, sender, guild) => {
         if (!sender.permissions.has(`MANAGE_ROLES`)) {
             return missingPermission(interaction);
         }
 
-        const create = interaction.options.getSubcommand(`créer`);
+        const subcommand = interaction.options.getSubcommand();
 
-        if (create) {
+        if (subcommand === `create`) {
             const channel = interaction.options.getChannel(`salon`);
             const messageId = interaction.options.getString(`messageid`);
             const emoji = interaction.options.getString(`emoji`);
@@ -59,14 +79,21 @@ module.exports = {
 
                 message.react(emoji);
 
-                await addRolemenu(guildId, channel.id, message.id, emoji, role.id);
+                await addRolemenu(guild.id, channel.id, message.id, emoji, role.id);
 
                 return interaction.reply(`Channel -> <#${channel.id}>\nMessage -> ${message.content}\nEmoji ${emoji}\nRole -> <@&${role.id}>`);
             });
         }
 
-        if (!create) {
+        if (subcommand === `delete`) {
 
+        }
+
+        if (subcommand === `list`) {
+            const rolemenus = await getRolemenus(guild.id);
+            
+            if (rolemenus.length >= 1) return interaction.reply({ embeds: [embedEnum.ROLEMENUS_LIST(guild, rolemenus)] });
+            else return interaction.reply({ embeds: [embedEnum.ROLEMENUS_EMPTY(guild)] });
         }
     }
 }

@@ -4,7 +4,7 @@ module.exports = {
     name: `messageReactionRemove`,
     run: async (Discord, client, messageReaction, user) => {
         if (user.bot) return;
-        if (!messageReaction.guild) return;
+        if (!messageReaction.message.guild) return;
 
         const emoji = messageReaction.emoji;
 

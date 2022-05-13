@@ -117,4 +117,26 @@ module.exports = {
             .setColor(`#FF4343`)
             .setTimestamp();
     },
+    ROLEMENUS_LIST: (guild, rolemenus) => {
+        const embed = new MessageEmbed()
+            .setDescription(`⚡ **Voici la liste des rôles avec menus.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#4D66FF`)
+            .setTimestamp();
+
+        rolemenus.forEach(rm => {
+            embed.addField(`${rm._id}:`, `• ID Message: ${rm.messageId}\n• Salon: ${rm.channel}\n• Rôle: ${rm.role}\n• Emoji: ${rm.emoji}`, true);
+        });
+
+        return embed;
+    },
+    ROLEMENUS_EMPTY: (guild) => {
+        const embed = new MessageEmbed()
+            .setDescription(`❌ **Il n'y a aucun rôle avec menu sur le serveur.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+
+        return embed;
+    }
 }
