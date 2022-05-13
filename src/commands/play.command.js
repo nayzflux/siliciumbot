@@ -21,43 +21,71 @@ module.exports = {
             return interaction.reply({ embeds: [embedEnum.VOICE_CHANNEL_REQUIRED(guild)] });
         }
 
+        // attendre que le message s'envoie
+        await interaction.reply({ embeds: [embedEnum.THANKS_FOR_WAITING(guild)] });
+
         // c'est un lien
         if (musicHelper.isUrl(music)) {
+            // c'est un lien spotify
             if (musicHelper.isSpotifyUrl(music)) {
+                // le lien est bon
+                if (await musicHelper.isValidTrackUrl(music)) {
+                    // obtenir la musique depuis spotify
+                    musicHelper.getSongFromTrack(music, (err, song) => {
+                        if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_NOT_FOUND(guild)] });
 
+                        // téléchargement de la musique
+                        musicHelper.download(song, (err) => {
+                            if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_DOWNLOAD_ERROR(guild)] });
+
+                            // ajout de la musique dans la file d'attente
+                            musicHelper.addSong(guild.id, song);
+
+                            // jouer la musique
+                            musicHelper.play(guild.id, voiceChannel, (err, isCurentlyPlayed) => {
+                                if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAY_ERROR(guild)] });
+
+                                if (isCurentlyPlayed) {
+                                    return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAYED(guild, song)] });
+                                } else {
+                                    return interaction.editReply({ embeds: [embedEnum.MUSIC_ADDED_TO_QUEUE(guild, song)] });
+                                }
+                            });
+                        });
+                    });
+                }
+                return;
             }
 
             if (musicHelper.isYoutubeUrl(music)) {
-
+                return interaction.editReply({ embeds: [embedEnum.MUSIC_URL_NOT_SUPPORTED(guild)] });
             }
 
-            return interaction.reply({ embeds: [embedEnum.MUSIC_URL_NOT_SUPPORTED(guild)] });
-        }
+            return interaction.editReply({ embeds: [embedEnum.MUSIC_URL_NOT_SUPPORTED(guild)] });
+        } else {
+            // recherche de la musique
+            musicHelper.search(music, (err, song) => {
+                if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_NOT_FOUND(guild)] });
 
-        interaction.reply({ embeds: [embedEnum.THANKS_FOR_WAITING(guild)] })
+                // téléchargement de la musique
+                musicHelper.download(song, (err) => {
+                    if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_DOWNLOAD_ERROR(guild)] });
 
-        // recherche de la musique
-        musicHelper.search(music, (err, song) => {
-            if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_NOT_FOUND(guild)] });
+                    // ajout de la musique dans la file d'attente
+                    musicHelper.addSong(guild.id, song);
 
-            // téléchargement de la musique
-            musicHelper.download(song, (err) => {
-                if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_DOWNLOAD_ERROR(guild)] });
+                    // jouer la musique
+                    musicHelper.play(guild.id, voiceChannel, (err, isCurentlyPlayed) => {
+                        if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAY_ERROR(guild)] });
 
-                // ajout de la musique dans la file d'attente
-                musicHelper.addSong(guild.id, song);
-
-                // jouer la musique
-                musicHelper.play(guild.id, voiceChannel, (err, isCurentlyPlayed) => {
-                    if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAY_ERROR(guild)] });
-
-                    if (isCurentlyPlayed) {
-                        return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAYED(guild, song)] });
-                    } else {
-                        return interaction.editReply({ embeds: [embedEnum.MUSIC_ADDED_TO_QUEUE(guild, song)] });
-                    }
+                        if (isCurentlyPlayed) {
+                            return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAYED(guild, song)] });
+                        } else {
+                            return interaction.editReply({ embeds: [embedEnum.MUSIC_ADDED_TO_QUEUE(guild, song)] });
+                        }
+                    });
                 });
-            })
-        });
+            });
+        }
     }
 }

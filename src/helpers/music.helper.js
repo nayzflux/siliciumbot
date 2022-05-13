@@ -2,6 +2,7 @@ const ytSearch = require(`yt-search`);
 const ytdl = require(`ytdl-core`);
 const fs = require(`fs`);
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require(`@discordjs/voice`);
+const fetch = require(`node-fetch`);
 const queue = new Map();
 
 const DOWLOAD_PATH = `./temp/musics/`;
@@ -62,7 +63,9 @@ const isYoutubeUrl = (text) => {
 
 const search = async (query, callback) => {
     const result = await ytSearch(query);
-    const video = result.videos[0]
+    const video = result.videos[0];
+
+    console.log(`[MUSIC] 🔎 Searching ${query}...`);
 
     if (video) {
         const song = { title: clearText(video.title), publisher: clearText(video.author.name), url: video.url }
@@ -288,6 +291,81 @@ const getServerQueue = (guildId, callback) => {
     return callback(false, serverQueue);
 }
 
+const getToken = async () => {
+    const response = await fetch(
+        `https://accounts.spotify.com/api/token?grant_type=client_credentials`,
+        {
+            method: `POST`,
+            headers: {
+                Authorization: `Basic ` + (new Buffer(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64')),
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        }
+    );
+
+    const data = await response.json();
+
+    return data.access_token;
+}
+
+const getSongFromTrack = async (link, callback) => {
+    const trackId = await getTrackIdFromLink(link);
+    const token = await getToken();
+
+    try {
+        const response = await fetch(
+            `https://api.spotify.com/v1/tracks?ids=${trackId}&market=FR`,
+            {
+                method: `GET`,
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        for (track of data.tracks) {
+            const artists = track.artists;
+            let str = track.name;
+
+            for (i in artists) {
+                str = `${str} ${artists[i].name}`
+            }
+
+            console.log(`🔥 Importing ${str} from Spotify...`);
+
+            // get song
+            search(str, (err, song) => {
+                return callback(false, song);
+            });
+        }
+    } catch (err) {
+        return callback(true, null);
+    }
+}
+
+/**
+ * Transform
+ * https://open.spotify.com/track/4mmJ9f97Yr1E7YuEu92ir2?si=b95a9a73395147e2
+ * to
+ * 4mmJ9f97Yr1E7YuEu92ir2
+ */
+const getTrackIdFromLink = async (link) => {
+    if (link.split(`/`).length >= 4 && link.split(`/`)[4].split(`?`).length >= 1) {
+        if (link.split(`/`).length >= 4) {
+            const trackId = link.split(`/`)[4].split(`?`)[0];
+            return trackId;
+        }
+    }
+    return null;
+}
+
+const isValidTrackUrl = async (link) => {
+    if (await getTrackIdFromLink(link) === null) return false;
+    else return true;
+}
+
 
 module.exports = {
     isUrl,
@@ -300,5 +378,7 @@ module.exports = {
     tooglePause,
     skip,
     stop,
-    getServerQueue
+    getServerQueue,
+    isValidTrackUrl,
+    getSongFromTrack
 }
