@@ -37,6 +37,10 @@ const guildSchema = new mongoose.Schema(
             type: String,
             default: null
         },
+        privateRoomChannelId: {
+            type: String,
+            default: null
+        },
         rolemenus: [
             {
                 roleId: {
