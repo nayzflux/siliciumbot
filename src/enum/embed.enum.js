@@ -165,5 +165,23 @@ module.exports = {
             .setTimestamp();
 
         return embed;
+    },
+    PRIVATE_ROOM_CHANNEL_ENABLED: (guild, channelId) => {
+        const embed = new MessageEmbed()
+            .setDescription(`✅ **Le système de salon privé est désormais activé, rejoigner <#${channelId}> pour créer un salon privé.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#00FF00`)
+            .setTimestamp();
+
+        return embed;
+    },
+    PRIVATE_ROOM_CHANNEL_DISABLED: (guild) => {
+        const embed = new MessageEmbed()
+            .setDescription(`❎ **Le système de salon privé est désormais désactivé.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#00FF00`)
+            .setTimestamp();
+
+        return embed;
     }
 }

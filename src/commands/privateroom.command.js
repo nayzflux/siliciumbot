@@ -1,4 +1,5 @@
-const { getWarns, warn, removeWarn } = require("../controllers/warn.controller");
+const privateRoomController = require(`../controllers/privateroom.controller`);
+const embedEnum = require(`../enum/embed.enum`);
 
 module.exports = {
     name: `privateroom`,
@@ -34,18 +35,14 @@ module.exports = {
 
         const channel = interaction.options.getChannel(`salon`);
 
-        if (subcommand === `list`) {
-            const warns = await getWarns(guild.id, target.user.id);
-
-            interaction.reply(`\`\`\`js\n${warns}\n\`\`\``)
-        }
-
         if (subcommand === `enable`) {
-
+            const data = await privateRoomController.setPrivateRoomChannelId(guild.id, channel.id);
+            return interaction.reply({embeds: [embedEnum.PRIVATE_ROOM_CHANNEL_ENABLED(guild, data.privateRoomChannelId)]});
         }
 
         if (subcommand === `disable`) {
-            
+            const privateRoomChannelId = await privateRoomController.setPrivateRoomChannelId(guild.id, null);
+            return interaction.reply({embeds: [embedEnum.PRIVATE_ROOM_CHANNEL_DISABLED(guild, null)]});
         }
     }
 }
