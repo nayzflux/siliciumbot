@@ -1,6 +1,6 @@
 const { MessageEmbed } = require(`discord.js`);
 
-const FOOTER = `❤️`;
+const FOOTER = `❤️ [Inviter](https://discord.com/api/oauth2/authorize?client_id=772868067305848842&permissions=8&scope=bot) - 🔎 [GitHub](https://github.com/NayZBySodium/siliciumbot)`;
 
 module.exports = {
     VOICE_CHANNEL_REQUIRED: (guild) => {
