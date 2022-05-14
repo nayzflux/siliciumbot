@@ -138,5 +138,23 @@ module.exports = {
             .setTimestamp();
 
         return embed;
+    },
+    ACTIVITY_NOT_FOUND: (guild) => {
+        const embed = new MessageEmbed()
+            .setDescription(`❌ **Cette activité n'existe pas.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+
+        return embed;
+    },
+    ACTIVITY_STARTED: (guild, url) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🎲 **Activité lancer, [cliquer ici](${url}) pour rejoindre.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FFFFFF`)
+            .setTimestamp();
+
+        return embed;
     }
 }
