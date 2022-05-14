@@ -20,7 +20,7 @@ module.exports = {
         const targetChannel = interaction.options.getChannel(`salon`);
 
         // modifier les permissions du salon
-        targetChannel.permissionOverwrites.edit(targetChannel.guild.roles.everyone, { SEND_MESSAGES: false });
+        targetChannel.permissionOverwrites.edit(targetChannel.guild.roles.everyone, { ADD_REACTIONS: false, CREATE_PRIVATE_THREADS: false, CREATE_PUBLIC_THREADS: false, SEND_MESSAGES_IN_THREADS: false, SEND_MESSAGES: false });
 
         // envoyer les messages
         channelLocked(targetChannel);
