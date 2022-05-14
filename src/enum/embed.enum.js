@@ -1,6 +1,6 @@
 const { MessageEmbed } = require(`discord.js`);
 
-const FOOTER = `❤️ [Inviter](https://discord.com/api/oauth2/authorize?client_id=772868067305848842&permissions=8&scope=bot) - 🔎 [GitHub](https://github.com/NayZBySodium/siliciumbot)`;
+const FOOTER = `❤️ Inviter: bit.ly/3wc3TIC - 🔎 GitHub: https://bit.ly/3wcYuAN`;
 
 module.exports = {
     VOICE_CHANNEL_REQUIRED: (guild) => {
@@ -151,6 +151,15 @@ module.exports = {
     ACTIVITY_STARTED: (guild, url) => {
         const embed = new MessageEmbed()
             .setDescription(`🎲 **Activité lancer, [cliquer ici](${url}) pour rejoindre.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FFFFFF`)
+            .setTimestamp();
+
+        return embed;
+    },
+    LEVEL_UP: (guild, level) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🔰 **Vous avez atteint le niveau \`${level.level}\` (\`${(Math.round(level.level * 10000 + level.xp)).toLocaleString()}\` EXP) sur \`${guild.name}\`.**`)
             .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
             .setColor(`#FFFFFF`)
             .setTimestamp();

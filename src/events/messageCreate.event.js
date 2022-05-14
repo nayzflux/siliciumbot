@@ -1,5 +1,9 @@
 const { analyze } = require(`../helpers/toxicityScanner.helper`);
 const { warn } = require(`../controllers/warn.controller`);
+const { getRoleById } = require(`../helpers/role.helper`);
+const levelController = require(`../controllers/level.controller`);
+const rewardController = require(`../controllers/reward.controller`);
+const embedEnum = require(`../enum/embed.enum`);
 
 const MAX_LEVEL = 0.65;
 const MIN_LEVEL = 0.45;
@@ -8,6 +12,31 @@ module.exports = {
     name: `messageCreate`,
     run: async (Discord, client, message) => {
         if (!message.author.bot && message.embeds.lentgh !== 0 && message.guild) {
+            // NIVEAU ET XP
+            // calculer le multiplicateur allant jusqu'a x3
+            const multiplier = Math.random() * (2 - 1) + 1;
+            // le message doit rapporter maximum 3 point
+            const amount = (((message.content.length * multiplier / 25) <= 3) ? (message.content.length * multiplier / 25) : 3) * 100;
+            const level = await levelController.addXp(message.guild.id, message.author.id, amount);
+
+            // si l'experience est supérieur à 100
+            if (level.xp >= 10000) {
+                // enlever 100 à l'xp
+                await levelController.setXp(message.guild.id, message.author.id, (level.xp - 10000));
+                // monter d'un niveau
+                const newLevel = await levelController.levelUp(message.guild.id, message.author.id, 1);
+                const reward = await rewardController.getRewardForLevel(message.guild.id, newLevel.level);
+                const roleReward = await getRoleById(message.guild.id, reward.roleId);
+
+                message.author.send({ embeds: [embedEnum.LEVEL_UP(message.guild, newLevel)] }).catch(err => console.log(err));
+                message.member.roles.add(roleReward, `Récompense de niveau ${newLevel.level}`).catch(err => console.log(err));
+
+                console.log(`[LEVEL] 🔰 ${message.author.tag} level up, reward ${(roleReward ? roleReward.name : `❌`)}`);
+            }
+
+            console.log(`[LEVEL] 🔰 ${message.author.tag} has posted a message of ${message.content.length} letters and earn ${amount} with x${multiplier} multiplier`);
+
+            // AUTO-MODERATION
             analyze(message.content, (toxicity, severToxicity, indentityAttack, insult, profanity, threat) => {
                 // si les scores sont en dessous du MAX mais qu'au moins 1 est au dessous du MIN
                 if (MAX_LEVEL > toxicity && MAX_LEVEL > severToxicity && MAX_LEVEL > indentityAttack && MAX_LEVEL > insult && MAX_LEVEL > profanity && MAX_LEVEL > threat) {
