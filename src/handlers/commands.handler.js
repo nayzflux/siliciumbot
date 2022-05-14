@@ -26,13 +26,13 @@ const loadCommands = async (Discord, client) => {
             // );
 
             // register slash commands for prod
-            // client.application.commands.create(
-            //     {
-            //         name: command.name,
-            //         description: command.description,
-            //         options: command.options
-            //     }
-            // );
+            client.application.commands.create(
+                {
+                    name: command.name,
+                    description: command.description,
+                    options: command.options
+                }
+            );
 
             return console.log(`[COMMAND] 💪 Command /${command.name} (./commands/${fileName}) loaded`);
         });
