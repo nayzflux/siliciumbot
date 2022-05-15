@@ -1,6 +1,5 @@
 const embedEnum = require(`../enum/embed.enum`);
 const levelController = require(`../controllers/level.controller`);
-const levelHelper = require(`../helpers/level.helper`);
 
 module.exports = {
     name: `xp`,
@@ -35,7 +34,6 @@ module.exports = {
                     type: `NUMBER`,
                     description: `Le nombre d'XP que vous voulez définir au membre`,
                     required: true,
-                    maxValue: 9999,
                     minValue: 0
                 }
             ]
@@ -56,7 +54,6 @@ module.exports = {
                     type: `NUMBER`,
                     description: `Le nombre d'XP que vous voulez ajouter au membre`,
                     required: true,
-                    maxValue: 9999,
                     minValue: 1
                 }
             ]
@@ -71,14 +68,13 @@ module.exports = {
                     type: `USER`,
                     description: `Membre dont vous voulez modifier l'XP`,
                     required: true,
-                    maxValue: 9999,
-                    minValue: 1
                 },
                 {
                     name: `nombre`,
                     type: `NUMBER`,
                     description: `Le nombre d'XP que vous voulez retirer du membre`,
-                    required: true
+                    required: true,
+                    minValue: 1
                 }
             ]
         },
@@ -89,27 +85,23 @@ module.exports = {
         const amount = interaction.options.getNumber(`nombre`);
 
         if (subcommand === `show`) {
-            const level = await levelController.getXp(guild.id, target.user.id);
-            await levelHelper.checkForLevelUpAndReward(guild, target);
-            return interaction.reply({ embeds: [embedEnum.MEMBER_LEVEL(guild, target, level)] });
+            const data = await levelController.get(guild, target);
+            return interaction.reply({ embeds: [embedEnum.MEMBER_LEVEL(guild, target, data)] });
         }
 
         if (subcommand === `set`) {
-            const level = await levelController.setXp(guild.id, target.user.id, amount);
-            await levelHelper.checkForLevelUpAndReward(guild, target);
-            return interaction.reply({ embeds: [embedEnum.MEMBER_LEVEL_CHANGED(guild, target, level)] });
+            const data = await levelController.setXp(guild, target, amount);
+            return interaction.reply({ embeds: [embedEnum.MEMBER_LEVEL_CHANGED(guild, target, data)] });
         }
 
         if (subcommand === `add`) {
-            const level = await levelController.addXp(guild.id, target.user.id, amount);
-            await levelHelper.checkForLevelUpAndReward(guild, target);
-            return interaction.reply({ embeds: [embedEnum.MEMBER_LEVEL_CHANGED(guild, target, level)] });
+            const data = await levelController.addXp(guild, target, amount);
+            return interaction.reply({ embeds: [embedEnum.MEMBER_LEVEL_CHANGED(guild, target, data)] });
         }
 
         if (subcommand === `remove`) {
-            const level = await levelController.removeXp(guild.id, target.user.id, amount);
-            await levelHelper.checkForLevelUpAndReward(guild, target);
-            return interaction.reply({ embeds: [embedEnum.MEMBER_LEVEL_CHANGED(guild, target, level)] });
+            const data = await levelController.removeXp(guild, target, amount);
+            return interaction.reply({ embeds: [embedEnum.MEMBER_LEVEL_CHANGED(guild, target, data)] });
         }
     }
 }

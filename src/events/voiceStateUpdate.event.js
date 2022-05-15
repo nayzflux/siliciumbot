@@ -1,5 +1,5 @@
 const privateRoomController = require(`../controllers/privateroom.controller`);
-const levelHelper = require(`../helpers/level.helper`);
+const levelController = require(`../controllers/level.controller`);
 const map = new Map();
 
 module.exports = {
@@ -29,8 +29,8 @@ module.exports = {
             const joinedAt = map.get(oldState.member.id);
 
             if (joinedAt) {
-                await levelHelper.xpOnVoiceChannelTimeSpent(guild.id, member.user.id, joinedAt);
-                await levelHelper.checkForLevelUpAndReward(guild, member);
+                const minutes = new Date(Date.now() - joinedAt).getMinutes();
+                levelController.addXp(guild, member, minutes * 25);
             }
         }
 
@@ -48,8 +48,8 @@ module.exports = {
             map.set(newState.member.id, Date.now());
 
             if (joinedAt) {
-                await levelHelper.xpOnVoiceChannelTimeSpent(guild.id, member.user.id, joinedAt);
-                await levelHelper.checkForLevelUpAndReward(guild, member);
+                const minutes = new Date(Date.now() - joinedAt).getMinutes();
+                levelController.addXp(guild, member, minutes * 25);
             }
         }
     }

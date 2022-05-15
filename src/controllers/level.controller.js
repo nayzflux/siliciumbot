@@ -1,87 +1,190 @@
+const { Guild, GuildMember } = require(`discord.js`);
 const LevelModel = require(`../models/level.model`);
+const rewardController = require(`../controllers/reward.controller`);
+const embedEnum = require("../enum/embed.enum");
 
-const addXp = async (guildId, userId, amount) => {
+/**
+ * Ajouter de l'XP au membre
+ * @param {Guild} guild 
+ * @param {GuildMember} member 
+ * @param {Number} amount 
+ * @returns
+ */
+const addXp = async (guild, member, amount) => {
+    const guildId = guild.id;
+    const userId = member.user.id;
+
     if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { $inc: { xp: amount } }, { new: true });
-        return level;
+        const data = await LevelModel.findOne({ guildId, userId });
+        const oldLevel = data.level;
+
+        data.xp += amount;
+        data.level = Math.floor(data.xp / 10000);
+
+        if (data.level > oldLevel) {
+            rewardController.rewards(guild, member, data.level);
+            member.user.send({ embeds: [embedEnum.LEVEL_UP(guild, data)] }).catch(err => console.log(err));
+        }
+
+        data.save()
+            .catch(err => console.log(`[XP] ❌ ${guild.name} » Unable to add ${amount} XP to ${member.user.tag}`, err))
+            .then(() => console.log(`[XP] ✅ ${guild.name} » ${amount} XP added to ${member.user.tag}, he's level ${data.level} (${data.xp} XP)`));
+
+        return data;
     } else {
-        const level = await LevelModel.create({ guildId, userId, xp: amount });
-        return level;
+        const data = new LevelModel({ guildId, userId });
+        const oldLevel = data.level;
+
+        data.xp += amount;
+        data.level = Math.floor(data.xp / 10000);
+
+        if (data.level > oldLevel) {
+            rewardController.rewards(guild, member, data.level);
+            member.user.send({ embeds: [embedEnum.LEVEL_UP(guild, data)] }).catch(err => console.log(err));
+        }
+
+        data.save()
+            .catch(err => console.log(`[XP] ❌ ${guild.name} » Unable to add ${amount} XP to ${member.user.tag}`, err))
+            .then(() => console.log(`[XP] ✅ ${guild.name} » ${amount} XP added to ${member.user.tag}, he's level ${data.level} (${data.xp} XP)`));
+
+        return data;
     }
 }
 
-const removeXp = async (guildId, userId, amount) => {
+/**
+ * Retirer de l'XP au membre
+ * @param {Guild} guild 
+ * @param {GuildMember} member 
+ * @param {Number} amount 
+ * @returns
+ */
+const removeXp = async (guild, member, amount) => {
+    const guildId = guild.id;
+    const userId = member.user.id;
+
     if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { $inc: { xp: -amount } }, { new: true });
-        return level;
+        const data = await LevelModel.findOne({ guildId, userId });
+        const oldLevel = data.level;
+
+        data.xp -= amount;
+        data.level = Math.floor(data.xp / 10000);
+
+        if (data.level < oldLevel) {
+            rewardController.rewards(guild, member, data.level);
+            member.user.send({ embeds: [embedEnum.LEVEL_UP(guild, data)] }).catch(err => console.log(err));
+        }
+
+        data.save()
+            .catch(err => console.log(`[XP] ❌ ${guild.name} » Unable to remove ${amount} XP to ${member.user.tag}`, err))
+            .then(() => console.log(`[XP] ✅ ${guild.name} » ${amount} XP removed to ${member.user.tag}, he's level ${data.level} (${data.xp} XP)`));
+
+        return data;
     } else {
-        const level = await LevelModel.create({ guildId, userId, xp: -amount });
-        return level;
+        const data = new LevelModel({ guildId, userId });
+        const oldLevel = data.level;
+
+        data.xp -= amount;
+        data.level = Math.floor(data.xp / 10000);
+
+        if (data.level < oldLevel) {
+            rewardController.rewards(guild, member, data.level);
+            member.user.send({ embeds: [embedEnum.LEVEL_UP(guild, data)] }).catch(err => console.log(err));
+        }
+
+        data.save()
+            .catch(err => console.log(`[XP] ❌ ${guild.name} » Unable to add ${amount} XP to ${member.user.tag}`, err))
+            .then(() => console.log(`[XP] ✅ ${guild.name} » ${amount} XP removed to ${member.user.tag}, he's level ${data.level} (${data.xp} XP)`));
+
+        return data;
     }
 }
 
-const setXp = async (guildId, userId, amount) => {
+/**
+ * Définir l'XP du membre
+ * @param {Guild} guild 
+ * @param {GuildMember} member 
+ * @param {Number} amount 
+ * @returns
+ */
+const setXp = async (guild, member, amount) => {
+    const guildId = guild.id;
+    const userId = member.user.id;
+
     if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { xp: amount }, { new: true });
-        return level;
+        const data = await LevelModel.findOne({ guildId, userId });
+        const oldLevel = data.level;
+
+        data.xp = amount;
+        data.level = Math.floor(data.xp / 10000);
+
+        if (data.level < oldLevel) {
+            rewardController.rewards(guild, member, data.level);
+            member.user.send({ embeds: [embedEnum.LEVEL_UP(guild, data)] }).catch(err => console.log(err));
+        }
+
+        if (data.level > oldLevel) {
+            rewardController.rewards(guild, member, data.level);
+            member.user.send({ embeds: [embedEnum.LEVEL_UP(guild, data)] }).catch(err => console.log(err));
+        }
+
+        data.save()
+            .catch(err => console.log(`[XP] ❌ ${guild.name} » Unable to set ${member.user.tag}'s XP to ${amount}`, err))
+            .then(() => console.log(`[XP] ✅ ${guild.name} » ${member.user.tag}'s XP set to ${amount}, he's level ${data.level} (${data.xp} XP)`));
+
+        return data;
     } else {
-        const level = await LevelModel.create({ guildId, userId, xp: amount });
-        return level;
+        const data = new LevelModel({ guildId, userId });
+        const oldLevel = data.level;
+
+        data.xp = amount;
+        data.level = Math.floor(data.xp / 10000);
+        if (data.level < oldLevel) {
+            rewardController.rewards(guild, member, data.level);
+            member.user.send({ embeds: [embedEnum.LEVEL_UP(guild, data)] }).catch(err => console.log(err));
+        }
+
+        if (data.level > oldLevel) {
+            rewardController.rewards(guild, member, data.level);
+            member.user.send({ embeds: [embedEnum.LEVEL_UP(guild, data)] }).catch(err => console.log(err));
+        }
+
+        data.save()
+            .catch(err => console.log(`[XP] ❌ ${guild.name} » Unable to set ${member.user.tag}'s XP to ${amount}`, err))
+            .then(() => console.log(`[XP] ✅ ${guild.name} » ${member.user.tag}'s XP set to ${amount}, he's level ${data.level} (${data.xp} XP)`));
+
+        return data;
     }
 }
 
-const getXp = async (guildId, userId) => {
+/**
+ * Obtenir l'XP et le niveau du membre
+ * @param {Guild} guild 
+ * @param {GuildMember} member 
+ * @returns level and xp
+ */
+const get = async (guild, member) => {
+    const guildId = guild.id;
+    const userId = member.user.id;
+
     if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOne({ guildId, userId });
-        return level;
+        const data = await LevelModel.findOne({ guildId, userId });
+        return data;
     }
 
-    return 0;
+    return { guildId, userId, level: 0, xp: 0 };
 }
 
-const getLevel = async (guildId, userId) => {
-    if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOne({ guildId, userId });
-        return level;
-    }
+/**
+ * Obtenir l'XP et le niveau des membres
+ * @param {Guild} guild
+ * @returns list of level and xp
+ */
+const getAll = async (guild) => {
+    const guildId = guild.id;
 
-    return 0;
-}
-
-const levelUp = async (guildId, userId, amount) => {
-    if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { $inc: { level: amount } }, { new: true });
-        return level;
-    } else {
-        const level = await LevelModel.create({ guildId, userId, xp: amount });
-        return level;
-    }
-}
-
-const levelDown = async (guildId, userId, amount) => {
-    if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { $inc: { level: -amount } }, { new: true });
-        return level;
-    } else {
-        const level = await LevelModel.create({ guildId, userId, level: -amount });
-        return level;
-    }
-}
-
-const setLevel = async (guildId, userId, amount) => {
-    if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { level: amount }, { new: true });
-        return level;
-    } else {
-        const level = await LevelModel.create({ guildId, userId, level: amount });
-        return level;
-    }
-}
-
-const getLeadeboard = async (guildId) => {
     if (await LevelModel.exists({ guildId })) {
-        const levels = await LevelModel.find({ guildId }).sort({ level: -1, xp: -1 }).limit(25);
-        return levels;
+        const data = await LevelModel.find({ guildId }).sort({ level: -1, xp: -1 }).limit(25);
+        return data;
     } else {
         return [];
     }
@@ -91,10 +194,6 @@ module.exports = {
     addXp,
     removeXp,
     setXp,
-    levelUp,
-    levelDown,
-    setLevel,
-    getXp,
-    getLevel,
-    getLeadeboard
+    get,
+    getAll
 }

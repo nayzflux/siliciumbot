@@ -1,7 +1,6 @@
 const { analyze } = require(`../helpers/toxicityScanner.helper`);
 const { warn } = require(`../controllers/warn.controller`);
-const { getRoleById } = require(`../helpers/role.helper`);
-const levelHelper = require(`../helpers/level.helper`);
+const levelController = require(`../controllers/level.controller`);
 
 const MAX_LEVEL = 0.65;
 const MIN_LEVEL = 0.45;
@@ -11,9 +10,17 @@ module.exports = {
     run: async (Discord, client, message) => {
         if (!message.author.bot && message.embeds.lentgh !== 0 && message.guild) {
             // NIVEAU & LEVEL
-            await levelHelper.xpOnMessageSend(message.guild.id, message.member.user.id, message.content.length);
-            await levelHelper.checkForLevelUpAndReward(message.guild, message.member);
+            let amount = 50;
 
+            if (message.mentions.members.first()) {
+                amount += 25;
+            }
+
+            if (message.type === `REPLY`) {
+                amount += 25;
+            }
+
+            levelController.addXp(message.guild, message.member, amount);
             // AUTO-MODERATION
             analyze(message.content, (toxicity, severToxicity, indentityAttack, insult, profanity, threat) => {
                 // si les scores sont en dessous du MAX mais qu'au moins 1 est au dessous du MIN

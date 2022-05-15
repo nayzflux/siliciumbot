@@ -6,7 +6,7 @@ module.exports = {
     description: `Voir le classement des niveaux et XP`,
     options: [],
     run: async (Discord, client, interaction, sender, guild) => {
-        const leaderboard = await levelController.getLeadeboard(guild.id);
+        const leaderboard = await levelController.getAll(guild);
 
         if (leaderboard.length >= 1) {
             return interaction.reply({ embeds: [await embedEnum.LEADERBOARD(guild, leaderboard)] });

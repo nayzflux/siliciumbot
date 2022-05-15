@@ -158,9 +158,9 @@ module.exports = {
 
         return embed;
     },
-    LEVEL_UP: (guild, level) => {
+    LEVEL_UP: (guild, data) => {
         const embed = new MessageEmbed()
-            .setDescription(`🎓 **Vous avez atteint le niveau \`${level.level}\` (\`${(Math.round(level.level * 10000 + level.xp)).toLocaleString()}\` EXP) sur \`${guild.name}\`.**`)
+            .setDescription(`🎓 **Félicitations, vous avez atteint le niveau ${data.level} (${data.xp.toLocaleString()} XP) sur ${guild.name}.**`)
             .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
             .setColor(`#000000`)
             .setTimestamp();
@@ -185,18 +185,18 @@ module.exports = {
 
         return embed;
     },
-    MEMBER_LEVEL: (guild, member, level) => {
+    MEMBER_LEVEL: (guild, member, data) => {
         const embed = new MessageEmbed()
-            .setDescription(`🎓 **${member} est niveau ${level.level} (\`${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP\`).**`)
+            .setDescription(`🎓 **${member} est niveau ${data.level} (${data.xp.toLocaleString()} XP).**`)
             .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
             .setColor(`#000000`)
             .setTimestamp();
 
         return embed;
     },
-    MEMBER_LEVEL_CHANGED: (guild, member, level) => {
+    MEMBER_LEVEL_CHANGED: (guild, member, data) => {
         const embed = new MessageEmbed()
-            .setDescription(`🎓 **${member} est désormais niveau ${level.level} (\`${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP\`).**`)
+            .setDescription(`🎓 **${member} est désormais niveau ${data.level} (${data.xp.toLocaleString()} XP).**`)
             .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
             .setColor(`#000000`)
             .setTimestamp();
@@ -220,24 +220,24 @@ module.exports = {
             .setTimestamp();
 
         for (i in leaderboard) {
-            const level = leaderboard[i];
+            const data = leaderboard[i];
 
-            const member = await getMemberById(guild.id, level.userId);
+            const member = await getMemberById(guild.id, data.userId);
 
             if (i == 0) {
-                embed.addField(`🥇 ${member.user.tag}`, `» Niveau ${level.level} (${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP)`);
+                embed.addField(`🥇 ${member.displayName}`, `» Niveau ${data.level} (${data.xp.toLocaleString()} XP)`);
             }
 
             if (i == 1) {
-                embed.addField(`🥈 ${member.user.tag}`, `» Niveau ${level.level} (${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP)`);
+                embed.addField(`🥈 ${member.displayName}`, `» Niveau ${data.level} (${data.xp.toLocaleString()} XP)`);
             }
 
             if (i == 2) {
-                embed.addField(`🥉 ${member.user.tag}`, `» Niveau ${level.level} (${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP)`);
+                embed.addField(`🥉 ${member.displayName}`, `» Niveau ${data.level} (${data.xp.toLocaleString()} XP)`);
             }
 
             if (i != 0 && i != 1 && i != 2) {
-                embed.addField(`🏵 ${member.user.tag}`, `» Niveau ${level.level} (${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP)`);
+                embed.addField(`🏵 ${member.displayName}`, `» Niveau ${data.level} (${data.xp.toLocaleString()} XP)`);
             }
         }
 
