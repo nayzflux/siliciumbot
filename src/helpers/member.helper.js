@@ -6,7 +6,7 @@ module.exports.getMemberById = async (guildId, memberId) => {
     // si le serveur n'existe pas
     if (!guild) return null;
 
-    const member = guild.channels.cache.get(memberId);
+    const member = await guild.members.fetch(memberId);
 
     // si le rôle n'existe pas
     if (!member) return null;

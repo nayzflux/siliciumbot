@@ -1,4 +1,5 @@
 const { MessageEmbed } = require(`discord.js`);
+const { getMemberById } = require(`../helpers/member.helper`);
 
 const FOOTER = `❤️ Inviter: bit.ly/3wc3TIC - 🔎 GitHub: https://bit.ly/3wcYuAN`;
 
@@ -199,6 +200,46 @@ module.exports = {
             .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
             .setColor(`#000000`)
             .setTimestamp();
+
+        return embed;
+    },
+    LEADERBOARD_EMPTY_ERROR: (guild) => {
+        const embed = new MessageEmbed()
+            .setDescription(`❌ **Le classement de niveau est vide.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+
+        return embed;
+    },
+    LEADERBOARD: async (guild, leaderboard) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🏆 **Classement de niveau : ${guild.name}**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#000000`)
+            .setTimestamp();
+
+        for (i in leaderboard) {
+            const level = leaderboard[i];
+
+            const member = await getMemberById(guild.id, level.userId);
+
+            if (i == 0) {
+                embed.addField(`🥇 ${member.user.tag}`, `» Niveau ${level.level} (${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP)`);
+            }
+
+            if (i == 1) {
+                embed.addField(`🥈 ${member.user.tag}`, `» Niveau ${level.level} (${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP)`);
+            }
+
+            if (i == 2) {
+                embed.addField(`🥉 ${member.user.tag}`, `» Niveau ${level.level} (${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP)`);
+            }
+
+            if (i != 0 && i != 1 && i != 2) {
+                embed.addField(`🏵 ${member.user.tag}`, `» Niveau ${level.level} (${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP)`);
+            }
+        }
 
         return embed;
     }

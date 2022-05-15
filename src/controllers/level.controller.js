@@ -78,6 +78,15 @@ const setLevel = async (guildId, userId, amount) => {
     }
 }
 
+const getLeadeboard = async (guildId) => {
+    if (await LevelModel.exists({ guildId })) {
+        const levels = await LevelModel.find({ guildId }).sort({ level: -1, xp: -1 }).limit(25);
+        return levels;
+    } else {
+        return [];
+    }
+}
+
 module.exports = {
     addXp,
     removeXp,
@@ -86,5 +95,6 @@ module.exports = {
     levelDown,
     setLevel,
     getXp,
-    getLevel
+    getLevel,
+    getLeadeboard
 }
