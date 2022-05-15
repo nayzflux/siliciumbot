@@ -159,9 +159,9 @@ module.exports = {
     },
     LEVEL_UP: (guild, level) => {
         const embed = new MessageEmbed()
-            .setDescription(`🔰 **Vous avez atteint le niveau \`${level.level}\` (\`${(Math.round(level.level * 10000 + level.xp)).toLocaleString()}\` EXP) sur \`${guild.name}\`.**`)
+            .setDescription(`🎓 **Vous avez atteint le niveau \`${level.level}\` (\`${(Math.round(level.level * 10000 + level.xp)).toLocaleString()}\` EXP) sur \`${guild.name}\`.**`)
             .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
-            .setColor(`#FFFFFF`)
+            .setColor(`#000000`)
             .setTimestamp();
 
         return embed;
@@ -180,6 +180,24 @@ module.exports = {
             .setDescription(`❎ **Le système de salon privé est désormais désactivé.**`)
             .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
             .setColor(`#00FF00`)
+            .setTimestamp();
+
+        return embed;
+    },
+    MEMBER_LEVEL: (guild, member, level) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🎓 **${member} est niveau ${level.level} (\`${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP\`).**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#000000`)
+            .setTimestamp();
+
+        return embed;
+    },
+    MEMBER_LEVEL_CHANGED: (guild, member, level) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🎓 **${member} est désormais niveau ${level.level} (\`${Math.round((level.level * 10000 + level.xp)).toLocaleString()} XP\`).**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#000000`)
             .setTimestamp();
 
         return embed;

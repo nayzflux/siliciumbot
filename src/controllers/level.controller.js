@@ -1,14 +1,5 @@
 const LevelModel = require(`../models/level.model`);
 
-const calculAmount = (messageSize) => {
-    // multiplicateur allant jusquà x3
-    const multiplier = Math.floor(Math.random() * 3);
-
-    // le message peut rapporter 3 point maximum
-    if (messageSize * multiplier <= (11 * 3)) return (messageSize * multiplier / 11)
-    else return 3;
-}
-
 const addXp = async (guildId, userId, amount) => {
     if (await LevelModel.exists({ guildId, userId })) {
         const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { $inc: { xp: amount } }, { new: true });
@@ -29,14 +20,32 @@ const removeXp = async (guildId, userId, amount) => {
     }
 }
 
-const setXp = async (guildId, userId, xp) => {
+const setXp = async (guildId, userId, amount) => {
     if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { xp }, { new: true });
+        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { xp: amount }, { new: true });
         return level;
     } else {
-        const level = await LevelModel.create({ guildId, userId, xp });
+        const level = await LevelModel.create({ guildId, userId, xp: amount });
         return level;
     }
+}
+
+const getXp = async (guildId, userId) => {
+    if (await LevelModel.exists({ guildId, userId })) {
+        const level = await LevelModel.findOne({ guildId, userId });
+        return level;
+    }
+
+    return 0;
+}
+
+const getLevel = async (guildId, userId) => {
+    if (await LevelModel.exists({ guildId, userId })) {
+        const level = await LevelModel.findOne({ guildId, userId });
+        return level;
+    }
+
+    return 0;
 }
 
 const levelUp = async (guildId, userId, amount) => {
@@ -59,12 +68,12 @@ const levelDown = async (guildId, userId, amount) => {
     }
 }
 
-const setLevel = async (guildId, userId, level) => {
+const setLevel = async (guildId, userId, amount) => {
     if (await LevelModel.exists({ guildId, userId })) {
-        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { level }, { new: true });
+        const level = await LevelModel.findOneAndUpdate({ guildId, userId }, { level: amount }, { new: true });
         return level;
     } else {
-        const level = await LevelModel.create({ guildId, userId, level });
+        const level = await LevelModel.create({ guildId, userId, level: amount });
         return level;
     }
 }
@@ -76,5 +85,6 @@ module.exports = {
     levelUp,
     levelDown,
     setLevel,
-    calculAmount
+    getXp,
+    getLevel
 }
