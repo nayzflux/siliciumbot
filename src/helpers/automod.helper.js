@@ -82,7 +82,9 @@ const scan = (guild, channel, author, message) => {
                     if (member.permissions.has(`MANAGE_MESSAGES`)) return true;
                 };
 
-                const reportChannel = await getChannelById(guild.id, `976182337568141462`);
+                // const reportChannel = await getChannelById(guild.id, `976182337568141462`);
+
+                return;
 
                 let mentions = `***⚠️ __Alerte de modération:__ `
 
