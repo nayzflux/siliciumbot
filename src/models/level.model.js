@@ -2,11 +2,11 @@ const mongoose = require(`mongoose`);
 
 const levelSchema = new mongoose.Schema(
     {
-        userId: {
+        guildId: {
             type: String,
             required: true
         },
-        guildId: {
+        userId: {
             type: String,
             required: true
         },

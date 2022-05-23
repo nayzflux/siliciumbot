@@ -1,4 +1,5 @@
 const { MessageEmbed } = require(`discord.js`);
+const moment = require("moment");
 const { getMemberById } = require(`../helpers/member.helper`);
 
 const FOOTER = `❤️ Inviter: bit.ly/3wc3TIC - 🔎 GitHub: https://bit.ly/3wcYuAN`;
@@ -240,6 +241,89 @@ module.exports = {
                 embed.addField(`🏵 ${member.displayName}`, `» Niveau ${data.level} (${data.xp.toLocaleString()} XP)`);
             }
         }
+
+        return embed;
+    },
+    WARN_MESSAGE: (guild, _id, author, reason, manual, message, createdAt) => {
+        const embed = new MessageEmbed()
+            .setDescription(`⚠️ **Vous avez reçu un avertissement.**`)
+            .addField(`🏡 • Serveur`, guild.name, false)
+            .addField(`📄 • Raison`, reason, false)
+            .addField(`🦺 • Par`, author.tag, false)
+            .addField(`🚩 • Message`, (message ? message : `Non spécifié ❌`), false)
+            .addField(`🔎 • Confirmé par examen manuel`, (manual ? `Oui ✅` : `Non ❌`), false)
+            .addField(`📅 • Date`, moment(createdAt).format(`[Le] DD/MM/YYYY [à] hh:mm:ss`), false)
+            .addField(`🪧 • ID de sanction`, _id.toString(), false)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FFEC4D`)
+            .setTimestamp();
+
+        return embed;
+    },
+    WARN_REMOVED_MESSAGE: (guild, _id, author, reason, manual, message, createdAt) => {
+        const embed = new MessageEmbed()
+            .setTitle(`⚖️ **Sanction mise à jour**`)
+            .setDescription(`Suite à une vérification effectué par un membre du staff de \`${guild.name}\`, nous en avons conclu que l'avertissement dont vous avez fait l'objet n'était pas justifié.\nVotre avertissement a donc été retiré.`)
+            .addField(`🏡 • Serveur`, guild.name, false)
+            .addField(`📄 • Raison`, reason, false)
+            .addField(`🦺 • Par`, (author.tag ? author.tag : `Inconnu 🤖`), false)
+            .addField(`📅 • Date`, moment(createdAt).format(`[Le] DD/MM/YYYY [à] hh:mm:ss`), false)
+            .addField(`🪧 • ID de sanction`, _id.toString(), false)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#00FF00`)
+            .setTimestamp();
+
+        return embed;
+    },
+    WARNS_LIST_MESSAGE: (guild, target, warns) => {
+        const embed = new MessageEmbed()
+            .setTitle(`⚠️ **Liste d'avertissement de ${target.tag}**`)
+            .setDescription(`Voici la liste de tout les avertissement dont ${target} à fait l'objet.`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FFEC4D`)
+            .setTimestamp();
+
+
+
+        warns.forEach(warn => {
+            embed.addField(moment(warn.createdAt).format(`[- Le] DD/MM/YYYY [à] hh:mm:ss`), `• Raison: \`${warn.reason}\`\n• Par: <@${warn.authorId}>\n• Message: \`${(warn.message ? warn.message : `Non spécifié ❌`)}\`\n• Confirmé par examen manuel: \`${(warn.manual ? `Oui ✅` : `Non ❌`)}\`\n• ID de sanction: \`${warn._id}\``, true);
+        });
+
+        return embed;
+    },
+    ERROR_WARNS_LIST_EMPTY: (guild, target) => {
+        const embed = new MessageEmbed()
+            .setDescription(`❌ ${target} n'a fait l'objet d'aucun avertissement.`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+
+        return embed;
+    },
+    AUTOMOD_REPORT_MESSAGE: (guild, message, scores) => {
+        const embed = new MessageEmbed()
+            .setTitle(`📌 **• Rapport de Modération**`)
+            .setDescription(`Un message suspect a été détecté automatiquement par le système d'Auto-Modération 🤖.\nVeuillez verifier si le message est inapproprié.`)
+            .addField(`**• __Message suspect:__**`, `\`${message.content}\``, false)
+            .addField(`**• __Contexte:__**`, `[Clique ici pour voir le contexte](https://discord.com/channels/${guild.id}/${channel.id}/${message.id})`, false)
+            .addField(`**• __Score de toxicité:__**`, `\`${Math.round(scores.toxicity * 100)}%\``, true)
+            .addField(`**• __Score de toxicité profonde:__**`, `\`${Math.round(scores.severToxicity * 100)}%\``, true)
+            .addField(`**• __Score de discrimination:__**`, `\`${Math.round(scores.indentityAttack * 100)}%\``, true)
+            .addField(`**• __Score d'insulte:__**`, `\`${Math.round(scores.insult * 100)}%\``, true)
+            .addField(`**• __Score de profanation:__**`, `\`${Math.round(scores.profanity * 100)}%\``, true)
+            .addField(`**• __Score de menace:__**`, `\`${Math.round(scores.threat * 100)}%\``, true)
+            .setFooter(`❤️ AutoMod • 2022 • NayZ#5847 🦺`)
+            .setThumbnail(message.guild.iconURL)
+            .setColor(`#FF0000`);
+
+        return embed;
+    },
+    ERROR_MISSING_PERMS: (guild) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🚫 **Vous n'avez pas les permissions requises.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
 
         return embed;
     }

@@ -1,4 +1,5 @@
-const { getWarns, warn, removeWarn } = require("../controllers/warn.controller");
+const warnController = require("../controllers/warn.controller");
+const embedEnum = require("../enum/embed.enum");
 
 module.exports = {
     name: `warn`,
@@ -58,7 +59,7 @@ module.exports = {
     ],
     run: async (Discord, client, interaction, sender, guild) => {
         if (!sender.permissions.has(`MANAGE_MESSAGES`)) {
-            return interaction.reply(`❌ **| \`Vous n'avez pas d'avertir les membres les membres !\`**`);
+            return interaction.reply({ embeds: [embedEnum.ERROR_MISSING_PERMS(guild)] });
         }
 
         const subcommand = interaction.options.getSubcommand();
@@ -68,60 +69,27 @@ module.exports = {
         const warnId = interaction.options.getString(`warnid`);
 
         if (subcommand === `list`) {
-            const warns = await getWarns(guild.id, target.user.id);
+            const warns = await warnController.getWarns(guild, target.user);
 
-            interaction.reply(`\`\`\`js\n${warns}\n\`\`\``)
+            if (warns != []) {
+                interaction.reply({embeds: [embedEnum.WARNS_LIST_MESSAGE(guild, target, warns)]});
+            } else {
+                interaction.reply({embeds: [embedEnum.ERROR_WARNS_LIST_EMPTY(guild, target)]});
+            }
         }
 
         if (subcommand === `add`) {
-            await warn(guild.id, target.user.id, sender.id, reason, true);
-
-            const sanction = new Discord.MessageEmbed()
-                .setTitle(`⚠️ **• Sanction sur \`${guild.name}\`:**`)
-                .setDescription(`Vous avez reçu un avertissement.\nVous pensez que cela est une erreur ? Contactez un administrateur du serveur.`)
-                .addField(`📄 **• __Raison:__**`, `\`${reason}\``)
-                .addField(`🦺 **• __Averti par:__**`, `\`${sender.user.tag}\``,)
-                .addField(`🔎 **• __Confirmation par examen manuel:__**`, `✅`)
-                .setFooter(`❤️ ${client.user.tag} • 2022 • NayZ#5847 🦺`)
-                .setThumbnail(guild.iconURL)
-                .setColor(`#ECFF00`);
-
-            target.user.send({ embeds: [sanction] }).catch(err => console.log(err));
+            await warnController.createWarn(guild, target.user, sender.user, reason, true, null, null);
 
             interaction.reply(`✅ **• *Le membre ${target} a été averti avec succès !***`);
         }
 
         if (subcommand === `remove`) {
-            await removeWarn(guild.id, target.user.id, warnId);
+            const warn = await warnController.removeWarn(guild, target.user, warnId);
 
-            const sanction = new Discord.MessageEmbed()
-                .setTitle(`📄 **• Modification de sanction \`${guild.name}\`:**`)
-                .setDescription(`Suite à une vérification effectué par un membre du staff de \`${guild.name}\`, nous en avons conclu que l'avertissement dont vous avez fait l'objet n'était pas justifié.\nVotre avertissement a donc été retiré.`)
-                .setFooter(`❤️ ${client.user.tag} • 2022 • NayZ#5847 🦺`)
-                .setThumbnail(guild.iconURL)
-                .setColor(`#ECFF00`);
+            if (!warn) return interaction.reply(`❌ **• *L'avertissement du membre ${target} est introuvable !***`);
 
-            target.user.send({ embeds: [sanction] }).catch(err => console.log(err));
-
-            interaction.reply(`✅ **• *L'averissement du membre ${target} a été retirer avec succès !***`);
+            interaction.reply(`✅ **• *L'avertissement du membre ${target} a été retirer avec succès !***`);
         }
-
-        // // si le membre possède un rôle plus elevé
-        // if (targetMember.roles.highest.position >= sender.roles.highest.position && sender.id !== guild.ownerId) {
-        //     return interaction.reply(`❌ **| \`Vous n'avez pas les permissions de bannir cet utilisateur !\`**`);
-        // }
-
-        // // si l'utilisateur n'est pas bannissable
-        // if (!targetMember.bannable) {
-        //     return interaction.reply(`❌ **| \`Impossible de bannir cet utilisateur !\`**`);
-        // }
-
-        // targetMember.send(`⛔ **| \`Vous avez été banni de façon permanente sur le serveur suivant : ${guild.name} pour la raison suivante : ${reason} !\`**`);
-
-        // // bannir le membre
-        // targetMember.ban({ days: 7, reason: reason });
-
-        // // envoyer le message
-        // interaction.reply(`✅ **| \`Le membre\` <@${targetMember.id}> \`a été banni avec succès pour la raison suivante : ${reason} !\`**`);
     }
 }

@@ -13,3 +13,15 @@ module.exports.getMemberById = async (guildId, memberId) => {
 
     return member;
 }
+
+module.exports.getModerators = async (guildId) => {
+    const guild = client.guilds.cache.get(guildId);
+
+    // si le serveur n'existe pas
+    if (!guild) return null;
+
+    const members = await guild.members.fetch();
+    const moderators = members.filter(member => member.permissions.has(`MANAGE_MESSAGES`));
+
+    return moderators;
+}
