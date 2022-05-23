@@ -72,9 +72,9 @@ module.exports = {
             const warns = await warnController.getWarns(guild, target.user);
 
             if (warns != []) {
-                interaction.reply({embeds: [embedEnum.WARNS_LIST_MESSAGE(guild, target, warns)]});
+                interaction.reply({ embeds: [embedEnum.WARNS_LIST_MESSAGE(guild, target, warns)] });
             } else {
-                interaction.reply({embeds: [embedEnum.ERROR_WARNS_LIST_EMPTY(guild, target)]});
+                interaction.reply({ embeds: [embedEnum.ERROR_WARNS_LIST_EMPTY(guild, target)] });
             }
         }
 

@@ -8,7 +8,7 @@ const MIN_LEVEL = 0.45;
 module.exports = {
     name: `messageCreate`,
     run: async (Discord, client, message) => {
-        if (!message.author.bot && message.embeds.lentgh !== 0 && message.guild) {
+        if (!message.author.bot && message.content && message.guild) {
             // NIVEAU & LEVEL
             let amount = 50;
 
