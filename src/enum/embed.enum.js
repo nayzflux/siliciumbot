@@ -1,6 +1,7 @@
 const { MessageEmbed } = require(`discord.js`);
 const moment = require("moment");
 const { getMemberById } = require(`../helpers/member.helper`);
+const { getRoleById } = require("../helpers/role.helper");
 
 const FOOTER = `❤️ Inviter: bit.ly/3wc3TIC - 🔎 GitHub: https://bit.ly/3wcYuAN`;
 
@@ -326,5 +327,48 @@ module.exports = {
             .setTimestamp();
 
         return embed;
-    }
+    },
+    NO_REWARDS_ERROR: (guild) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🚫 **Il n'y a pas de récompense sur le serveur.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+
+        return embed;
+    },
+    REWARD_SET: (guild, role, level) => {
+        const embed = new MessageEmbed()
+            .setDescription(`➕ **La récompense niveau ${level} est désormais <@&${role.id}>.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#ff57eb`)
+            .setTimestamp();
+
+        return embed;
+    },
+    REWARD_DELETED: (guild, level) => {
+        const embed = new MessageEmbed()
+            .setDescription(`➖ **La récompense niveau ${level} a été supprimé.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#ffb357`)
+            .setTimestamp();
+
+        return embed;
+    },
+    REWARDS_LIST: async (guild, rewards) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🎁 **Voici la liste des récompenses:**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#fff557`)
+            .setTimestamp();
+
+        for (i in rewards) {
+            const reward = rewards[i];
+            const role = await getRoleById(guild.id, reward.roleId);
+
+            embed.addField(`• ${reward.level}`, `${role.id ? `<@&${role.id}>` : `❌ Rôle supprimé`}`, false);
+        }
+
+        return embed;
+    },
 }

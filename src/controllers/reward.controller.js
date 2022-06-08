@@ -14,7 +14,7 @@ const createReward = async (guild, level, role) => {
     const roleId = role.id;
 
     if (!await RewardModel.exists({ guildId, level })) {
-        const reward = await RewardModel.create({ guildId, userId }, { roleId });
+        const reward = await RewardModel.create({ guildId, level, roleId });
 
         console.log(`[XP] ✅ ${guild.name} » Reward ${reward.level} created`);
 
