@@ -34,7 +34,7 @@ module.exports = {
             if (joinedAt) {
                 const minutes = new Date(Date.now() - joinedAt).getMinutes();
                 console.log(`[DEBUG] (${moment(Date.now()).format(`L [à] hh:mm:ss`)}) ${member.user.tag} spent ${minutes} minutes in voice channel`);
-                levelController.addXp(guild, member, minutes * 25);
+                levelController.addXp(guild, member, minutes * 40);
             }
         }
 
@@ -54,7 +54,7 @@ module.exports = {
             if (joinedAt) {
                 const minutes = new Date(Date.now() - joinedAt).getMinutes();
                 console.log(`[DEBUG] (${moment(Date.now()).format(`L [à] hh:mm:ss`)}) ${member.user.tag} spent ${minutes} minutes in voice channel`);
-                levelController.addXp(guild, member, (minutes * 25));
+                levelController.addXp(guild, member, (minutes * 40));
             }
         }
     }

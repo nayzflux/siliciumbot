@@ -12,6 +12,8 @@ module.exports = {
 
             if (!command) return interaction.reply({ embeds: [embedEnum.UNKNOWN_COMMAND_ERROR(guild)] });
 
+            levelController.addXp(guild, sender, 50);
+
             command.run(Discord, client, interaction, sender, guild);
         }
     }
