@@ -28,7 +28,7 @@ module.exports = {
         if (musicHelper.isUrl(music)) {
             // c'est un lien spotify
             if (musicHelper.isSpotifyUrl(music)) {
-                // le lien est bon
+                // le lien est une musique
                 if (await musicHelper.isValidTrackUrl(music)) {
                     // obtenir la musique depuis spotify
                     musicHelper.getSongFromTrack(music, (err, song) => {
@@ -54,7 +54,35 @@ module.exports = {
                         });
                     });
                 }
-                return;
+                // le lien est une playlist
+                if (await musicHelper.isValidPlaylistUrl(music)) {
+                    // obtenir la musique depuis spotify
+                    musicHelper.getSongsFromPlaylist(music, (err, songs) => {
+                        if (err) return interaction.editReply({ embeds: [embedEnum.PLAYLIST_NOT_FOUND(guild)] });
+
+                        for (song of songs) {
+                            // téléchargement de la musique
+                            musicHelper.download(song, (err) => {
+                                if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_DOWNLOAD_ERROR(guild)] });
+
+                                // ajout de la musique dans la file d'attente
+                                musicHelper.addSong(guild.id, song);
+
+                                // jouer la musique
+                                musicHelper.play(guild.id, voiceChannel, (err, isCurentlyPlayed) => {
+                                    if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAY_ERROR(guild)] });
+
+                                    if (isCurentlyPlayed) {
+                                        return interaction.editReply({ embeds: [embedEnum.MUSIC_PLAYED(guild, song)] });
+                                    } else {
+                                        return interaction.editReply({ embeds: [embedEnum.MUSIC_ADDED_TO_QUEUE(guild, song)] });
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+                return interaction.editReply({ embeds: [embedEnum.SPOTIFY_URL_NOT_SUPPORTED(guild)] });
             }
 
             if (musicHelper.isYoutubeUrl(music)) {

@@ -27,6 +27,13 @@ module.exports = {
             .setColor(`#FF4343`)
             .setTimestamp();
     },
+    MUSIC_NOT_FOUND: (guild) => {
+        return new MessageEmbed()
+            .setDescription(`❌ **La playlist n'a pas été trouvée.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+    },
     MUSIC_DOWNLOAD_ERROR: (guild) => {
         return new MessageEmbed()
             .setDescription(`❌ **Une erreur est survenue lors du téléchargement de la musique.**`)
@@ -65,6 +72,13 @@ module.exports = {
     NO_MUSIC_IN_QUEUE_ERROR: (guild) => {
         return new MessageEmbed()
             .setDescription(`❌ **La liste de lecture est vide.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+    },
+    SPOTIFY_URL_NOT_SUPPORTED: (guild) => {
+        return new MessageEmbed()
+            .setDescription(`❌ **Ce lien Spotify n'est pas une musique ou une playlist.**`)
             .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
             .setColor(`#FF4343`)
             .setTimestamp();

@@ -345,6 +345,52 @@ const getSongFromTrack = async (link, callback) => {
     }
 }
 
+const getSongsFromPlaylist = async (link, callback) => {
+    const playlistId = await getPlaylistIdFromLink(link);
+    const token = await getToken();
+
+    try {
+        const response = await fetch(
+            `https://api.spotify.com/v1/playlists/${playlistId}?market=FR`,
+            {
+                method: `GET`,
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        console.log(`[PLAYLIST] » Loading playlist ${data.name} by ${data.owner.display_name} with ${data.tracks.total} track(s)...`);
+
+        const songs = [];
+
+        for (item of data.tracks.items) {
+            const track = item.track;
+            let artists = ``;
+            const name = track.name;
+
+            for (artist of track.artists) {
+                artists = `${artist.name} `;
+            }
+
+            console.log(`[PLAYLIST] » Track ${name} by ${artists}fetched!`);
+
+            // get song
+            await search(`${name} ${artists}`, (err, song) => {
+                songs.push(song);
+
+                console.log(`[PLAYLIST] » Song ${song.title} by ${song.publisher} found!`);
+            });
+        }
+
+        return callback(false, songs);
+    } catch (err) {
+        return callback(true, null);
+    }
+}
+
 /**
  * Transform
  * https://open.spotify.com/track/4mmJ9f97Yr1E7YuEu92ir2?si=b95a9a73395147e2
@@ -361,8 +407,25 @@ const getTrackIdFromLink = async (link) => {
     return null;
 }
 
+const getPlaylistIdFromLink = async (link) => {
+    if (link.split(`/`).length >= 4 && link.split(`/`)[4].split(`?`).length >= 1) {
+        if (link.split(`/`).length >= 4) {
+            const trackId = link.split(`/`)[4].split(`?`)[0];
+            return trackId;
+        }
+    }
+    return null;
+}
+
 const isValidTrackUrl = async (link) => {
+    if (!link.startsWith(`https://open.spotify.com/track/`)) return false;
     if (await getTrackIdFromLink(link) === null) return false;
+    else return true;
+}
+
+const isValidPlaylistUrl = async (link) => {
+    if (!link.startsWith(`https://open.spotify.com/playlist/`)) return false;
+    if (await getPlaylistIdFromLink(link) === null) return false;
     else return true;
 }
 
@@ -390,5 +453,7 @@ module.exports = {
     getServerQueue,
     isValidTrackUrl,
     getSongFromTrack,
-    getFromYouTubeLink
+    getFromYouTubeLink,
+    isValidPlaylistUrl,
+    getSongsFromPlaylist
 }
