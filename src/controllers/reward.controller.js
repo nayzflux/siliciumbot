@@ -91,7 +91,7 @@ const getRewards = async (guild) => {
     const guildId = guild.id;
 
     if (await RewardModel.exists({ guildId })) {
-        const rewards = await RewardModel.find({ guildId });
+        const rewards = await RewardModel.find({ guildId }).limit(25);
         return rewards;
     }
 

@@ -56,12 +56,17 @@ module.exports = {
                 }
                 // le lien est une playlist
                 if (await musicHelper.isValidPlaylistUrl(music)) {
+                    interaction.editReply({ embeds: [embedEnum.IMPORTING_PLAYLIST(guild)] });
+
                     // obtenir la musique depuis spotify
                     musicHelper.getSongsFromPlaylist(music, (err, songs) => {
-                        if (err) return interaction.editReply({ embeds: [embedEnum.PLAYLIST_NOT_FOUND(guild)] });
+                        if (err) return interaction.editReply({ embeds: [embedEnum.PLAYLIST_NOT_FOUND_ERROR(guild)] });
 
-                        for (song of songs) {
+                        for (i in songs) {
+                            const song = songs[i];
                             // téléchargement de la musique
+                            interaction.editReply({ embeds: [embedEnum.DOWNLOADING_SONG(guild, song)] });
+
                             musicHelper.download(song, (err) => {
                                 if (err) return interaction.editReply({ embeds: [embedEnum.MUSIC_DOWNLOAD_ERROR(guild)] });
 
@@ -82,7 +87,6 @@ module.exports = {
                         }
                     });
                 }
-                return interaction.editReply({ embeds: [embedEnum.SPOTIFY_URL_NOT_SUPPORTED(guild)] });
             }
 
             if (musicHelper.isYoutubeUrl(music)) {
@@ -109,11 +113,7 @@ module.exports = {
                         });
                     });
                 });
-
-                return;
             }
-
-            return interaction.editReply({ embeds: [embedEnum.MUSIC_URL_NOT_SUPPORTED(guild)] });
         } else {
             // recherche de la musique
             musicHelper.search(music, (err, song) => {

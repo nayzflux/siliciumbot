@@ -69,6 +69,27 @@ module.exports = {
             .setColor(`#FFFFFF`)
             .setTimestamp();
     },
+    IMPORTING_PLAYLIST: (guild) => {
+        return new MessageEmbed()
+            .setDescription(`🔥 **Importation de la playlist depuis Spotify, merci de patienter.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FFFFFF`)
+            .setTimestamp();
+    },
+    DOWNLOADING_SONG: (guild, song) => {
+        return new MessageEmbed()
+            .setDescription(`⏬ **Téléchargement de ${song.title} de ${song.publisher} en cours...**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FFFFFF`)
+            .setTimestamp();
+    },
+    PLAYLIST_NOT_FOUND_ERROR: (guild) => {
+        return new MessageEmbed()
+            .setDescription(`❌ **Impossible d'importer cette playlist.**`)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+    },
     NO_MUSIC_IN_QUEUE_ERROR: (guild) => {
         return new MessageEmbed()
             .setDescription(`❌ **La liste de lecture est vide.**`)
