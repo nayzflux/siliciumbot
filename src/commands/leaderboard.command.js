@@ -6,12 +6,14 @@ module.exports = {
     description: `Voir le classement des niveaux et XP`,
     options: [],
     run: async (Discord, client, interaction, sender, guild) => {
+        interaction.reply({ embeds: [embedEnum.THANKS_FOR_WAITING(guild)] });
+
         const leaderboard = await levelController.getAll(guild);
 
         if (leaderboard.length >= 1) {
-            return interaction.reply({ embeds: [await embedEnum.LEADERBOARD(guild, leaderboard)] });
+            return interaction.editReply({ embeds: [await embedEnum.LEADERBOARD(guild, leaderboard)] });
         } else {
-            return interaction.reply({ embeds: [embedEnum.LEADERBOARD_EMPTY_ERROR(guild)] });
+            return interaction.editReply({ embeds: [embedEnum.LEADERBOARD_EMPTY_ERROR(guild)] });
         }
     }
 }
