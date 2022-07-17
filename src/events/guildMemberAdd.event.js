@@ -4,6 +4,7 @@ const { getJoinLeaveChannel } = require("../controllers/joinLeaveChannel.control
 const { getJoinMessage } = require(`../controllers/joinMessage.controller`);
 const { createCaptcha } = require("../helpers/captcha.helper");
 const fs = require(`fs`);
+const embedEnum = require("../enum/embed.enum");
 
 module.exports = {
     name: `guildMemberAdd`,
@@ -39,7 +40,7 @@ module.exports = {
                 try {
                     const code = await createCaptcha();
 
-                    await captchaChannel.send({ content: `🛃 **| ${member}\`, vous avez 20 secondes pour vérifier que vous n'êtes pas un robot\`**` });
+                    await captchaChannel.send({ embeds:[ embedEnum.CAPTCHA_VERIFICATION_REQUIRED(member)] });
                     captchaChannel.send({ files: [{ attachment: `./temp/captcha/${code}.png`, name: `captcha.png` }] });
 
                     const filter = async (m) => {
@@ -51,12 +52,12 @@ module.exports = {
                     const response = await captchaChannel.awaitMessages({ filter: filter, max: 1, time: 20000, errors: [] });
 
                     if (response.first() && response.first().content === code) {
-                        member.send(`✅ **| ${member}\` la vérification Anti-Robot a réussie\`**`);
+                        member.send({ embeds:[ embedEnum.CAPTCHA_VERIFICATION_SUCCESS()] }).catch(err => console.log(err));
                         member.roles.add(captchaRole).catch(err => console.log(err));
 
                         console.log(`[CAPTCHA] ✅ Captcha verification success`);
                     } else {
-                        await member.send(`⛔ **| ${member}\` la vérification Anti-Robot a échoué\`**`).catch(err => console.log(err));
+                        await member.send({ embeds:[ embedEnum.CAPTCHA_VERIFICATION_FAILED()] }).catch(err => console.log(err));
                         member.kick(`[AUTO] Vérification Anti-Robot échoué`).catch(err => console.log(err));
 
                         console.log(`[CAPTCHA] ⛔ Captcha verification failed`);

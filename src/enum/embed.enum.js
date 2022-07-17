@@ -6,6 +6,23 @@ const { getRoleById } = require("../helpers/role.helper");
 const FOOTER = `❤️ Inviter: bit.ly/3wc3TIC - 🔎 GitHub: https://bit.ly/3wcYuAN`;
 
 module.exports = {
+    TICKET_CREATED_MESSAGE: (guild, sender, level, ticketTitle, ticketDescription, ticketId) => {
+        if (level >= 2) level = `Critique 🔴`;
+        if (level === 1) level = `Elevé 🟡`;
+        if (level === 0) level = `Normal 🔵`;
+        if (level <= -1) level = `Faible 🟢`;
+
+        return new MessageEmbed()
+            .setTitle(`🆘 » Ticket créé par ${sender.displayName}`)
+            .setDescription(`Utiliser \`\`/ticket close ${ticketId} Résolu\`\` lorsque votre problème ou votre demande a été résolu.`)
+            .addField(`🎚️ • Gravité`, ` \`\`${level} \`\``)
+            .addField(`📄 • Titre`, ` \`\`${ticketTitle} \`\``)
+            .addField(`📁 • Description`, ` \`\`${ticketDescription} \`\``)
+            .addField(`📌 • ID du ticket`, ` \`\`${ticketId} \`\``)
+            .setFooter({ text: FOOTER, iconURL: guild.iconURL() })
+            .setColor(`#FF4343`)
+            .setTimestamp();
+    },
     VOICE_CHANNEL_REQUIRED: (guild) => {
         return new MessageEmbed()
             .setDescription(`❌ **Vous devez être dans un salon vocal.**`)
@@ -406,4 +423,25 @@ module.exports = {
 
         return embed;
     },
+    CAPTCHA_VERIFICATION_REQUIRED: (target) => {
+        const embed = new MessageEmbed()
+            .setDescription(`🛃 **${target}, vous avez __20__ secondes pour vérifier que vous n'êtes pas un robot**`)
+            .setColor(`0000FF`);
+
+        return embed;
+    },
+    CAPTCHA_VERIFICATION_SUCCESS: () => {
+        const embed = new MessageEmbed()
+            .setDescription(`✅ **Vérification ANTI-ROBOT réussite**`)
+            .setColor(`00FF00`);
+
+        return embed;
+    },
+    CAPTCHA_VERIFICATION_FAILED: () => {
+        const embed = new MessageEmbed()
+            .setDescription(`❌ **Vérification ANTI-ROBOT échoué**`)
+            .setColor(`FF0000`);
+
+        return embed;
+    }
 }
