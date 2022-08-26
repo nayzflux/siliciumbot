@@ -85,7 +85,7 @@ const download = (song, callback) => {
     }
 
     try {
-        const stream = ytdl(song.url);
+        const stream = ytdl(song.url, { filter: `audioonly` });
 
         console.log(`[MUSIC] ⏬ Download ${song.title} started...`);
 
